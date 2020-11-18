@@ -27,4 +27,4 @@ cf.read('ru/config/ru.cfg')
 #     }
 # else:
 
-es_ctrl = Elasticsearch([{'host': 'http://10.166.152.49/', 'port': 9200}])
+es_ctrl = Elasticsearch([{'host': '10.166.152.49', 'port': 9200}])
