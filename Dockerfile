@@ -13,8 +13,6 @@ RUN mkdir -p /ru_tools
 WORKDIR /ru_tools
 COPY ./ ./
 RUN pip3 install -r requirements.txt
-RUN ENV=production
-RUN export ENV
 
 EXPOSE 8000
 
