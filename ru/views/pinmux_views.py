@@ -30,7 +30,7 @@ def get(request):
                 template_id_b = request.GET.get(cf['PINMUX']['TEMPLATE_ID_B'])
                 a = es_ctrl.get(index=cf['PINMUX']['ES_INDEX'], id=template_id_a)['_source']['File'].split('\n')
                 b = es_ctrl.get(index=cf['PINMUX']['ES_INDEX'], id=template_id_b)['_source']['File'].split('\n')
-                content = difflib.HtmlDiff().make_file(a, b, context=True, numlines=5)
+                content = difflib.HtmlDiff().make_file(a, b, context=True, numlines=5).replace('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '&nbsp;&nbsp;')
                 return HttpResponse(content)
         return HttpResponse(404)
     except Exception as e:

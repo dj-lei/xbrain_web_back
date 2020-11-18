@@ -15,6 +15,16 @@ cf.read('ru/config/ru.cfg')
 # ENV_PROFILE = os.getenv("ENV")
 #
 # if ENV_PROFILE == "production":
-es_ctrl = Elasticsearch([{'host': '10.166.152.49', 'port': 9200}])
+#     DATABASES = {                 #生产环境数据库配置
+#         'default': {
+#             'ENGINE': 'django.db.backends.mysql',
+#             'NAME': '数据库名',
+#             'USER': 'root',
+#             'PASSWORD': '密码',
+#             'HOST': '生产环境数据库地址',
+#             'PORT': '3306',
+#         }
+#     }
 # else:
-#     es_ctrl = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+
+es_ctrl = Elasticsearch([{'host': 'http://10.166.152.49/', 'port': 9200}])
