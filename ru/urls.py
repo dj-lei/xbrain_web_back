@@ -9,6 +9,7 @@ urlpatterns = [
     path('pinmux/get', pinmux_views.get),
     path('pinmux/save', pinmux_views.save),
     path('admin/register', admin_views.register),
+    path('admin/login', admin_views.login),
     path('trouble_shooting/get', trouble_shooting_views.get),
     path('trouble_shooting/save', trouble_shooting_views.save),
 ]
