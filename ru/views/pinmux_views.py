@@ -61,7 +61,7 @@ def save(request):
 
             with open('ru/tmp/temp.txt') as file:
                 data = {'TemplateName': file_name, 'Asic': asic, 'Date': date, 'File': file.read()}
-                res = es_ctrl.index(index=cf['PINMUX']['ES_INDEX'], doc_type=cf['PINMUX']['ES_TYPE'], body=data)
+                _ = es_ctrl.index(index=cf['PINMUX']['ES_INDEX'], body=data)
                 return JsonResponse({'content': 'Success'})
         return HttpResponse(404)
     except Exception as e:

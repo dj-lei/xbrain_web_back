@@ -75,9 +75,9 @@ def get(request):
 def save(request):
     try:
         if request.method == 'POST':
+            data = request.POST.get(cf['TROUBLE_SHOOTING']['GET_DATA'])
             operate = request.POST.get(cf['TROUBLE_SHOOTING']['OPERATE'])
             if operate == cf['TROUBLE_SHOOTING']['NEW_ADD']:
-                data = request.POST.get(cf['TROUBLE_SHOOTING']['GET_DATA'])
                 _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TEMPLATE'], body=data)
                 return JsonResponse({'content': 'Success'})
             elif operate == cf['TROUBLE_SHOOTING']['UPDATE']:
