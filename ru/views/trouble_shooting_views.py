@@ -25,7 +25,7 @@ def get(request):
             elif operate == cf['TROUBLE_SHOOTING']['RELEASE_TASK']:
                 template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TEMPLATE'], id=template_id)['_source']
-                res = json.loads(re.sub(r'\"topic\"', '"Status": "active", "Executor": "pending", "style": {"fontWeight": "bold", "color": "#d35400"}, "topic"', json.dumps(res)))
+                res = json.loads(re.sub(r'\"topic\"', '"Status": "active", "Executor": "pending", "style": {"fontWeight": "bold", "color": "#f1c40e"}, "topic"', json.dumps(res)))
                 res['Status'] = cf['TROUBLE_SHOOTING']['STATUS_ACTIVE']
                 res['Date'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body=res)
@@ -51,6 +51,8 @@ def get(request):
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)['_source']
                 res['Status'] = 'close'
                 res['Date'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                replace_res = json.dumps(res).replace('#f1c40e', '#2ecc71').replace('active', 'close')
+                res = json.loads(replace_res)
 
                 _ = es_ctrl.delete(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)
                 _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body=res, id=template_id)
@@ -73,9 +75,9 @@ def get(request):
 def save(request):
     try:
         if request.method == 'POST':
-            data = request.POST.get(cf['TROUBLE_SHOOTING']['GET_DATA'])
             operate = request.POST.get(cf['TROUBLE_SHOOTING']['OPERATE'])
             if operate == cf['TROUBLE_SHOOTING']['NEW_ADD']:
+                data = request.POST.get(cf['TROUBLE_SHOOTING']['GET_DATA'])
                 _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TEMPLATE'], body=data)
                 return JsonResponse({'content': 'Success'})
             elif operate == cf['TROUBLE_SHOOTING']['UPDATE']:
@@ -103,6 +105,24 @@ def save(request):
                 _ = es_ctrl.delete(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)
                 _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body=result, id=template_id)
 
+                return JsonResponse({'content': result})
+            elif operate == cf['TROUBLE_SHOOTING']['SHOOTING']:
+                template_id = request.POST.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
+                selected = request.POST.get(cf['TROUBLE_SHOOTING']['SELECT_TASK'])
+                username = request.POST.get(cf['TROUBLE_SHOOTING']['USERNAME'])
+                res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)['_source']
+                replace_res = json.dumps(res)
+
+                before_node = mind_search_id(res['nodeData'], json.loads(selected)['id'])
+                after_node = before_node.copy()
+                after_node['Status'] = 'shooting'
+                after_node['Executor'] = username
+                after_node['style'] = {'fontWeight': 'bold', 'color': '#d35400'}
+                replace_res = replace_res.replace(json.dumps(before_node), json.dumps(after_node))
+                result = json.loads(replace_res)
+
+                _ = es_ctrl.delete(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)
+                _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body=result, id=template_id)
                 return JsonResponse({'content': result})
         return HttpResponse(404)
     except Exception as e:
