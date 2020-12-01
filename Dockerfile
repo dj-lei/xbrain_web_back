@@ -14,7 +14,6 @@ RUN mkdir -p /ru_be
 WORKDIR /ru_be
 COPY ./ ./
 RUN pip3 install -r requirements.txt
-RUN export env=product
 
 EXPOSE 8000
 
