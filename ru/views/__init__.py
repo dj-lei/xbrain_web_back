@@ -17,7 +17,7 @@ from ru.utils.common import *
 cf = configparser.ConfigParser()
 cf.read('ru/config/ru.cfg')
 
-profile = os.environ.get('ENV', 'develop')
+profile = os.environ.get('env', 'develop')
 if profile == 'product':
     es_ctrl = Elasticsearch([{'host': '10.166.152.49', 'port': 9200}])
 else:
