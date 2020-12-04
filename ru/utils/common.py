@@ -15,6 +15,19 @@ def query_dict(key, value):
     return doc
 
 
+def query_with(kv):
+    doc = {
+            "query": {
+                "bool": {
+                    "must": []
+                }
+            }
+        }
+    for k, v in kv:
+        doc["query"]["bool"]["must"].append({"term": {k: v}})
+    return doc
+
+
 def image_to_base64(image_path):
     pic = Image.open(image_path)
     pic = pic.convert('RGB')

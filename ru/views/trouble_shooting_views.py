@@ -84,6 +84,49 @@ def get(request):
                 response['Content-Disposition'] = res['name']
                 response['Access-Control-Expose-Headers'] = 'Content-Disposition'
                 return response
+            elif operate == cf['TROUBLE_SHOOTING']['GET_CHECKLIST_IMAGES']:
+                template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
+                node_id = request.GET.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits']
+                result = []
+                if len(res) > 0:
+                    res = res[0]['_source']['content']
+                    for elm in res:
+                        result.append("data:image/png;base64," + elm['content'])
+                return JsonResponse({'content': result})
+            elif operate == cf['TROUBLE_SHOOTING']['GET_CHECKLIST_LOGS']:
+                template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
+                node_id = request.GET.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits']
+                result = []
+                if len(res) > 0:
+                    res = res[0]['_source']['content']
+                    for elm in res:
+                        result.append({'uuid': elm['uuid'], 'name': elm['name'], 'username': elm['username'], 'created_time': elm['created_time']})
+                return JsonResponse({'content': result})
+            elif operate == cf['TROUBLE_SHOOTING']['GET_CHECKLIST_LOG']:
+                template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
+                node_id = request.GET.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
+                uuid_id = request.GET.get(cf['TROUBLE_SHOOTING']['UUID_ID'])
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits'][0]['_source']['content']
+
+                for elm in res:
+                    if elm['uuid'] == uuid_id:
+                        response = HttpResponse(file_decompress(elm['content']), 'application/txt')
+                        response['Content-Disposition'] = elm['name']
+                        response['Access-Control-Expose-Headers'] = 'Content-Disposition'
+                        return response
+                return HttpResponse(404)
+            elif operate == cf['TROUBLE_SHOOTING']['GET_CHECKLIST_COMMENTS']:
+                template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
+                node_id = request.GET.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_COMMENTS'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits']
+                result = []
+                if len(res) > 0:
+                    res = res[0]['_source']['content']
+                    for elm in res:
+                        result.append({'uuid': elm['uuid'], 'username': elm['username'], 'created_time': elm['created_time'], 'comment': elm['content']})
+                return JsonResponse({'content': result})
         return HttpResponse(404)
     except Exception as e:
         traceback.print_exc()
@@ -166,7 +209,73 @@ def save(request):
                     cp = file_compress(logs.read())
                     data = {'task_id': res['_id'], 'name': logs.name, 'content': str(cp)}
                     _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK_LOGS'], body=data)
+                return JsonResponse({'content': 'Success'})
+            elif operate == cf['TROUBLE_SHOOTING']['UPLOAD_CHECKLIST_IMAGES']:
+                username = request.POST.get(cf['ADMIN']['USERNAME'])
+                template_id = request.POST.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
+                node_id = request.POST.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
+                size = request.POST.get(cf['TROUBLE_SHOOTING']['GET_SIZE'])
 
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits']
+                if len(res) > 0:
+                    _id = res[0]['_id']
+                    res = res[0]['_source']
+                    if int(size) > 0:
+                        for i in range(0, int(size)):
+                            image = request.FILES.get(cf['TROUBLE_SHOOTING']['GET_IMAGES']+'_'+str(i))
+                            res['content'].append({'uuid': uuid.uuid1().hex, 'username': username, 'name': image.name, 'created_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'content': image_to_base64(image)})
+                        _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], id=_id, body={'doc': res})
+                else:
+                    if int(size) > 0:
+                        base64_images = []
+                        for i in range(0, int(size)):
+                            image = request.FILES.get(cf['TROUBLE_SHOOTING']['GET_IMAGES']+'_'+str(i))
+                            base64_images.append({'uuid': uuid.uuid1().hex, 'username': username, 'name': image.name, 'created_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'content': image_to_base64(image)})
+                        data = {'task_id': template_id, 'node_id': node_id, 'content': base64_images}
+                        _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], body=data)
+                return JsonResponse({'content': 'Success'})
+            elif operate == cf['TROUBLE_SHOOTING']['UPLOAD_CHECKLIST_LOGS']:
+                username = request.POST.get(cf['ADMIN']['USERNAME'])
+                template_id = request.POST.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
+                node_id = request.POST.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
+                size = request.POST.get(cf['TROUBLE_SHOOTING']['GET_SIZE'])
+
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits']
+                if len(res) > 0:
+                    _id = res[0]['_id']
+                    res = res[0]['_source']
+                    if int(size) > 0:
+                        for i in range(0, int(size)):
+                            log = request.FILES.get(cf['TROUBLE_SHOOTING']['GET_LOGS']+'_'+str(i))
+                            res['content'].append({'uuid': uuid.uuid1().hex, 'username': username, 'name': log.name, 'created_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'content': str(file_compress(log.read()))})
+                        _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'], id=_id, body={'doc': res})
+                else:
+                    if int(size) > 0:
+                        logs = []
+                        for i in range(0, int(size)):
+                            log = request.FILES.get(cf['TROUBLE_SHOOTING']['GET_LOGS']+'_'+str(i))
+                            logs.append({'uuid': uuid.uuid1().hex, 'username': username, 'name': log.name, 'created_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'content': str(file_compress(log.read()))})
+                        data = {'task_id': template_id, 'node_id': node_id, 'content': logs}
+                        _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'], body=data)
+                return JsonResponse({'content': 'Success'})
+            elif operate == cf['TROUBLE_SHOOTING']['UPLOAD_CHECKLIST_COMMENTS']:
+                username = request.POST.get(cf['ADMIN']['USERNAME'])
+                template_id = request.POST.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
+                node_id = request.POST.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
+
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_COMMENTS'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits']
+                if len(res) > 0:
+                    _id = res[0]['_id']
+                    res = res[0]['_source']
+                    comment = request.POST.get(cf['TROUBLE_SHOOTING']['GET_COMMENTS'])
+                    res['content'].append({'uuid': uuid.uuid1().hex, 'username': username, 'created_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'content': comment})
+                    _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_COMMENTS'], id=_id, body={'doc': res})
+                else:
+                    comments = []
+                    comment = request.POST.get(cf['TROUBLE_SHOOTING']['GET_COMMENTS'])
+                    comments.append({'uuid': uuid.uuid1().hex, 'username': username, 'created_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'content': comment})
+                    data = {'task_id': template_id, 'node_id': node_id, 'content': comments}
+                    _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_COMMENTS'], body=data)
                 return JsonResponse({'content': 'Success'})
         return HttpResponse(404)
     except Exception as e:

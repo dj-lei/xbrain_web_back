@@ -3,6 +3,7 @@ import io
 import re
 import json
 import time
+import uuid
 import difflib
 import configparser
 import traceback
