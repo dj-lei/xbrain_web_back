@@ -12,6 +12,7 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render
+from io import BytesIO
 from elasticsearch import Elasticsearch
 from ru.utils.common import *
 

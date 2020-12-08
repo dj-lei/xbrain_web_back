@@ -35,4 +35,20 @@ model = [
             }
         }
     },
+    {
+        'index': 'trouble-shooting-checklist-comments',
+        "mappings": {
+            "properties": {
+                "task_id": {
+                    "type": "keyword"
+                },
+                "node_id": {
+                    "type": "keyword"
+                },
+                "content": {
+                    "type": "object"
+                }
+            }
+        }
+    }
 ]

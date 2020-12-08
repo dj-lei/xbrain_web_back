@@ -6,14 +6,11 @@ def mind_get_list(node_data):
     if type(node_data) == list:
         for elm in node_data:
             if elm.__contains__('children'):
-                # temp.append([elm['id'], elm['topic'], elm['Status'], elm['Executor']])
                 temp.extend(mind_get_list(elm['children']))
-
             else:
                 temp.append([elm['id'], elm['topic'], elm['Status'], elm['Executor']])
     else:
         if node_data.__contains__('children'):
-            # temp.append([node_data['id'], node_data['topic'], node_data['Status'], node_data['Executor']])
             temp.extend(mind_get_list(node_data['children']))
         else:
             temp.append([node_data['id'], node_data['topic'], node_data['Status'], node_data['Executor']])
@@ -75,3 +72,20 @@ def mind_color_update(node_data):
             if node_data['Status'] == 'close':
                 node_data['style'] = {'fontWeight': 'bold', 'color': '#2ecc71'}
     return node_data
+
+
+def mind_export_to_csv(node_data, node=None):
+    temp = []
+    node = node if node else ''
+    if type(node_data) == list:
+        for elm in node_data:
+            if elm.__contains__('children'):
+                temp.extend(mind_export_to_csv(elm['children'], node+'/'+elm['topic']))
+            else:
+                temp.append([elm['topic'], node, elm['Status'], elm['Executor']])
+    else:
+        if node_data.__contains__('children'):
+            temp.extend(mind_export_to_csv(node_data['children'], node+'/'+node_data['topic']))
+        else:
+            temp.append([node_data['topic'], node, node_data['Status'], node_data['Executor']])
+    return temp

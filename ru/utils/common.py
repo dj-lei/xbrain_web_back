@@ -55,4 +55,4 @@ def file_compress(file):
 
 
 def file_decompress(file):
-    return gzip.decompress(eval(file)).decode()
+    return gzip.decompress(eval(file))
