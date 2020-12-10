@@ -70,8 +70,7 @@ def get(request):
                 replace_res = json.dumps(res).replace('#f1c40e', '#2ecc71').replace('active', 'close')
                 res = json.loads(replace_res)
 
-                _ = es_ctrl.delete(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)
-                _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body=res, id=template_id)
+                _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body={'doc': res}, id=template_id)
 
                 return JsonResponse({'content': 'Success'})
             elif operate == cf['TROUBLE_SHOOTING']['GET_TASK_DETAILS']:
@@ -168,14 +167,20 @@ def get(request):
                 xlwriter = pd.ExcelWriter(excel_file, engine='xlsxwriter')
                 temp.to_excel(xlwriter, res['_source']['TemplateName'])
                 xlwriter.save()
-                xlwriter.close()
 
                 excel_file.seek(0)
                 response = HttpResponse(excel_file.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
                 response['Content-Disposition'] = res['_source']['TemplateName']
                 response['Access-Control-Expose-Headers'] = 'Content-Disposition'
                 return response
+            elif operate == cf['TROUBLE_SHOOTING']['UPDATE_CHECKLIST_ASTERISK']:
+                template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
+                node_id = request.GET.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
 
+                res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)
+                res['_source']['nodeData'] = mind_update_checklist_asterisk(res['_source']['nodeData'], node_id)
+                _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id, body={'doc': res['_source']})
+                return JsonResponse({'content': res['_source'], 'id': template_id})
         return HttpResponse(404)
     except Exception as e:
         traceback.print_exc()
@@ -220,19 +225,10 @@ def save(request):
                 selected = request.POST.get(cf['TROUBLE_SHOOTING']['SELECT_TASK'])
                 username = request.POST.get(cf['TROUBLE_SHOOTING']['USERNAME'])
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)['_source']
-                replace_res = json.dumps(res)
 
-                before_node = mind_search_id(res['nodeData'], json.loads(selected)['id'])
-                after_node = before_node.copy()
-                after_node['Status'] = 'shooting'
-                after_node['Executor'] = username
-                after_node['style'] = {'fontWeight': 'bold', 'color': '#d35400'}
-                replace_res = replace_res.replace(json.dumps(before_node), json.dumps(after_node))
-                result = json.loads(replace_res)
-
-                _ = es_ctrl.delete(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)
-                _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body=result, id=template_id)
-                return JsonResponse({'content': result})
+                res['nodeData'] = mind_update_checklist_shooting(res['nodeData'], json.loads(selected)['id'], username)
+                _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body={'doc': res}, id=template_id)
+                return JsonResponse({'content': res})
             elif operate == cf['TROUBLE_SHOOTING']['RELEASE_TASK']:
                 template_id = request.POST.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
                 username = request.POST.get(cf['ADMIN']['USERNAME'])

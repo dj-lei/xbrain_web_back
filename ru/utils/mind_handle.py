@@ -89,3 +89,66 @@ def mind_export_to_csv(node_data, node=None):
         else:
             temp.append([node_data['topic'], node, node_data['Status'], node_data['Executor']])
     return temp
+
+
+def mind_update_checklist_asterisk(node_data, node_id):
+    if type(node_data) == list:
+        for index, elm in enumerate(node_data):
+            if elm.__contains__('children'):
+                result = mind_update_checklist_asterisk(elm['children'], node_id)
+                if result:
+                    node_data[index]['children'] = result
+                    return node_data
+            else:
+                if elm['id'] == node_id:
+                    node_data[index]['topic'] = elm['topic'].replace(' (*)','') if ' (*)' in elm['topic'] else elm['topic'] + ' (*)'
+                    return node_data
+        return False
+    else:
+        if node_data.__contains__('children'):
+            result = mind_update_checklist_asterisk(node_data['children'], node_id)
+            if result:
+                node_data['children'] = result
+                return node_data
+        else:
+            if node_data['id'] == node_id:
+                node_data['topic'] = node_data['topic'].replace(' (*)','') if ' (*)' in node_data['topic'] else node_data['topic'] + ' (*)'
+                return node_data
+    return node_data
+
+
+def mind_update_checklist_shooting(node_data, node_id, username):
+    if type(node_data) == list:
+        for index, elm in enumerate(node_data):
+            if elm.__contains__('children'):
+                result = mind_update_checklist_shooting(elm['children'], node_id, username)
+                if result:
+                    elm['Status'] = 'shooting'
+                    elm['Executor'] = username
+                    elm['style'] = {'fontWeight': 'bold', 'color': '#d35400'}
+                    node_data[index]['children'] = result
+                    return node_data
+            else:
+                if elm['id'] == node_id:
+                    elm['Status'] = 'shooting'
+                    elm['Executor'] = username
+                    elm['style'] = {'fontWeight': 'bold', 'color': '#d35400'}
+                    node_data[index] = elm
+                    return node_data
+        return False
+    else:
+        if node_data.__contains__('children'):
+            result = mind_update_checklist_shooting(node_data['children'], node_id, username)
+            if result:
+                node_data['Status'] = 'shooting'
+                node_data['Executor'] = username
+                node_data['style'] = {'fontWeight': 'bold', 'color': '#d35400'}
+                node_data['children'] = result
+                return node_data
+        else:
+            if node_data['id'] == node_id:
+                node_data['Status'] = 'shooting'
+                node_data['Executor'] = username
+                node_data['style'] = {'fontWeight': 'bold', 'color': '#d35400'}
+                return node_data
+    return node_data
