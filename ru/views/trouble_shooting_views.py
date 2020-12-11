@@ -204,29 +204,16 @@ def save(request):
                 selected = request.POST.get(cf['TROUBLE_SHOOTING']['SELECT_TASK'])
                 username = request.POST.get(cf['TROUBLE_SHOOTING']['USERNAME'])
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)['_source']
-                replace_res = json.dumps(res)
-                for select in json.loads(selected):
-                    before_node = mind_search_id(res['nodeData'], select['id'])
-                    after_node = before_node.copy()
-                    after_node['Status'] = 'close'
-                    after_node['Executor'] = username
-                    after_node['style'] = {'fontWeight': 'bold', 'color': '#2ecc71'}
-                    replace_res = replace_res.replace(json.dumps(before_node), json.dumps(after_node))
-                result = json.loads(replace_res)
-                after_res = mind_color_update(result['nodeData'])
-                result['nodeData'] = after_res
-
-                _ = es_ctrl.delete(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)
-                _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body=result, id=template_id)
-
-                return JsonResponse({'content': result})
+                res['nodeData'] = mind_update_checklist_shooting(res['nodeData'], json.loads(selected)[0]['id'], username, 'close')
+                _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body={'doc': res}, id=template_id)
+                return JsonResponse({'content': res})
             elif operate == cf['TROUBLE_SHOOTING']['SHOOTING']:
                 template_id = request.POST.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
                 selected = request.POST.get(cf['TROUBLE_SHOOTING']['SELECT_TASK'])
                 username = request.POST.get(cf['TROUBLE_SHOOTING']['USERNAME'])
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)['_source']
 
-                res['nodeData'] = mind_update_checklist_shooting(res['nodeData'], json.loads(selected)['id'], username)
+                res['nodeData'] = mind_update_checklist_shooting(res['nodeData'], json.loads(selected)['id'], username, 'shooting')
                 _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body={'doc': res}, id=template_id)
                 return JsonResponse({'content': res})
             elif operate == cf['TROUBLE_SHOOTING']['RELEASE_TASK']:

@@ -117,38 +117,45 @@ def mind_update_checklist_asterisk(node_data, node_id):
     return node_data
 
 
-def mind_update_checklist_shooting(node_data, node_id, username):
+def mind_update_checklist_shooting(node_data, node_id, username, operate='close'):
     if type(node_data) == list:
         for index, elm in enumerate(node_data):
             if elm.__contains__('children'):
-                result = mind_update_checklist_shooting(elm['children'], node_id, username)
+                result = mind_update_checklist_shooting(elm['children'], node_id, username, operate)
                 if result:
-                    elm['Status'] = 'shooting'
-                    elm['Executor'] = username
-                    elm['style'] = {'fontWeight': 'bold', 'color': '#d35400'}
-                    node_data[index]['children'] = result
-                    return node_data
+                    if operate == 'shooting':
+                        elm['Status'] = 'shooting'
+                        elm['Executor'] = username
+                        elm['style'] = {'fontWeight': 'bold', 'color': '#d35400'}
+                        node_data[index]['children'] = result
+                        return node_data
+                    if (operate == 'close') & ('shooting' not in json.dumps(result)):
+                        elm['Status'] = 'close'
+                        elm['Executor'] = username
+                        elm['style'] = {'fontWeight': 'bold', 'color': '#2ecc71'}
+                        node_data[index]['children'] = result
+                        return node_data
             else:
                 if elm['id'] == node_id:
-                    elm['Status'] = 'shooting'
+                    elm['Status'] = operate if operate == 'shooting' else 'close'
                     elm['Executor'] = username
-                    elm['style'] = {'fontWeight': 'bold', 'color': '#d35400'}
+                    elm['style'] = {'fontWeight': 'bold', 'color': '#d35400'} if operate == 'shooting' else {'fontWeight': 'bold', 'color': '#2ecc71'}
                     node_data[index] = elm
                     return node_data
         return False
     else:
         if node_data.__contains__('children'):
-            result = mind_update_checklist_shooting(node_data['children'], node_id, username)
+            result = mind_update_checklist_shooting(node_data['children'], node_id, username, operate)
             if result:
-                node_data['Status'] = 'shooting'
+                node_data['Status'] = operate if operate == 'shooting' else 'close'
                 node_data['Executor'] = username
-                node_data['style'] = {'fontWeight': 'bold', 'color': '#d35400'}
+                node_data['style'] = {'fontWeight': 'bold', 'color': '#d35400'} if operate == 'shooting' else {'fontWeight': 'bold', 'color': '#2ecc71'}
                 node_data['children'] = result
                 return node_data
         else:
             if node_data['id'] == node_id:
-                node_data['Status'] = 'shooting'
+                node_data['Status'] = operate if operate == 'shooting' else 'close'
                 node_data['Executor'] = username
-                node_data['style'] = {'fontWeight': 'bold', 'color': '#d35400'}
+                node_data['style'] = {'fontWeight': 'bold', 'color': '#d35400'} if operate == 'shooting' else {'fontWeight': 'bold', 'color': '#2ecc71'}
                 return node_data
     return node_data
