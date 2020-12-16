@@ -204,7 +204,9 @@ def save(request):
                 selected = request.POST.get(cf['TROUBLE_SHOOTING']['SELECT_TASK'])
                 username = request.POST.get(cf['TROUBLE_SHOOTING']['USERNAME'])
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)['_source']
-                res['nodeData'] = mind_update_checklist_shooting(res['nodeData'], json.loads(selected)[0]['id'], username, 'close')
+
+                for select in json.loads(selected):
+                    res['nodeData'] = mind_update_checklist_shooting(res['nodeData'], select['id'], username, 'close')
                 _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body={'doc': res}, id=template_id)
                 return JsonResponse({'content': res})
             elif operate == cf['TROUBLE_SHOOTING']['SHOOTING']:
@@ -213,7 +215,8 @@ def save(request):
                 username = request.POST.get(cf['TROUBLE_SHOOTING']['USERNAME'])
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)['_source']
 
-                res['nodeData'] = mind_update_checklist_shooting(res['nodeData'], json.loads(selected)['id'], username, 'shooting')
+                for select in json.loads(selected):
+                    res['nodeData'] = mind_update_checklist_shooting(res['nodeData'], select['id'], username, 'shooting')
                 _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body={'doc': res}, id=template_id)
                 return JsonResponse({'content': res})
             elif operate == cf['TROUBLE_SHOOTING']['RELEASE_TASK']:
@@ -224,7 +227,7 @@ def save(request):
                 logs_size = request.POST.get(cf['TROUBLE_SHOOTING']['GET_LOGS_SIZE'])
 
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TEMPLATE'], id=template_id)['_source']
-                res = json.loads(re.sub(r'\"topic\"', '"Status": "active", "Executor": "pending", "style": {"fontWeight": "bold", "color": "#f1c40e"}, "topic"', json.dumps(res)))
+                res = json.loads(re.sub(r'\"topic\"', '"Status": "active", "Executor": "pending", "style": {"fontWeight": "bold", "color": "#f39c11"}, "topic"', json.dumps(res)))
                 res['Description'] = description
                 res['Status'] = cf['TROUBLE_SHOOTING']['STATUS_ACTIVE']
                 res['Date'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
