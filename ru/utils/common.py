@@ -46,8 +46,7 @@ def image_to_base64(image_path):
 def base64_to_image(base64_str):
     byte_data = base64.b64decode(base64_str)
     image_data = BytesIO(byte_data)
-    img = Image.open(image_data)
-    return img
+    return image_data
 
 
 def file_compress(file):

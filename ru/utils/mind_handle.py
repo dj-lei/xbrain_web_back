@@ -159,3 +159,45 @@ def mind_update_checklist_shooting(node_data, node_id, username, operate='close'
                 node_data['style'] = {'fontWeight': 'bold', 'color': '#d35400'} if operate == 'shooting' else {'fontWeight': 'bold', 'color': '#2ecc71'}
                 return node_data
     return node_data
+
+
+def mind_update_template_to_task(updated_template, task):
+    if type(updated_template) == list:
+        for index, elm in enumerate(updated_template):
+            if elm.__contains__('children'):
+                updated_template[index]['children'] = mind_update_template_to_task(elm['children'], task)
+                temp_dict = mind_search_id(task, updated_template[index]['id'])
+                if len(temp_dict) > 0:
+                    updated_template[index]['Status'] = temp_dict['Status']
+                    updated_template[index]['Executor'] = temp_dict['Executor']
+                    updated_template[index]['style'] = temp_dict['style']
+                else:
+                    updated_template[index]['Status'] = 'active'
+                    updated_template[index]['Executor'] = 'pending'
+                    updated_template[index]['style'] = {"fontWeight": "bold", "color": "#f39c11"}
+            else:
+                temp_dict = mind_search_id(task, elm['id'])
+                if len(temp_dict) > 0:
+                    elm['Status'] = temp_dict['Status']
+                    elm['Executor'] = temp_dict['Executor']
+                    elm['style'] = temp_dict['style']
+                else:
+                    elm['Status'] = 'active'
+                    elm['Executor'] = 'pending'
+                    elm['style'] = {"fontWeight": "bold", "color": "#f39c11"}
+                updated_template[index] = elm
+        return updated_template
+    else:
+        if updated_template.__contains__('children'):
+            updated_template['children'] = mind_update_template_to_task(updated_template['children'], task)
+        else:
+            temp_dict = mind_search_id(task, updated_template['id'])
+            if len(temp_dict) > 0:
+                updated_template['Status'] = temp_dict['Status']
+                updated_template['Executor'] = temp_dict['Executor']
+                updated_template['style'] = temp_dict['style']
+            else:
+                updated_template['Status'] = 'active'
+                updated_template['Executor'] = 'pending'
+                updated_template['style'] = {"fontWeight": "bold", "color": "#f39c11"}
+    return updated_template

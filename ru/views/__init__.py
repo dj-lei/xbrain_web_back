@@ -21,8 +21,10 @@ cf.read('ru/config/ru.cfg')
 
 profile = os.environ.get('env', 'develop')
 if profile == 'product':
-    es_ctrl = Elasticsearch([{'host': '10.166.152.49', 'port': 9200}])
+    server_address = '10.166.152.49'
 else:
-    es_ctrl = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+    server_address = 'localhost'
+
+es_ctrl = Elasticsearch([{'host': server_address, 'port': 9200}])
 
 #elasticdump --input=http://localhost:9200/pages --output=http://10.166.152.49/es/pages  --type=data
