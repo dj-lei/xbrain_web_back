@@ -11,7 +11,7 @@ def upload(request):
                 addr = server_address
             else:
                 addr = server_address + ':8000'
-            return JsonResponse({'url': 'http://'+addr+'/ru/images/get?image_id='+res['_id']})
+            return JsonResponse({'success': 1, 'file': {'url': 'http://'+addr+'/ru/images/get?image_id='+res['_id']}})
         return HttpResponse(404)
     except Exception as e:
         traceback.print_exc()
