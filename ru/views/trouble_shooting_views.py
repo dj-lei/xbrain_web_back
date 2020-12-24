@@ -155,6 +155,7 @@ def get(request):
                     res = res[0]['_source']['content']
                     for elm in res:
                         result.append({'uuid': elm['uuid'], 'username': elm['username'], 'created_time': elm['created_time'], 'comment': elm['content']})
+                print(len(res))
                 return JsonResponse({'content': result})
             elif operate == cf['TROUBLE_SHOOTING']['EXPORT_TASK']:
                 template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
@@ -165,7 +166,7 @@ def get(request):
 
                 excel_file = BytesIO()
                 xlwriter = pd.ExcelWriter(excel_file, engine='xlsxwriter')
-                temp.to_excel(xlwriter, res['_source']['TemplateName'])
+                temp.to_excel(xlwriter, 'sheet1')
                 xlwriter.save()
 
                 excel_file.seek(0)
@@ -236,24 +237,24 @@ def save(request):
                 template_id = request.POST.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
                 username = request.POST.get(cf['ADMIN']['USERNAME'])
                 description = request.POST.get(cf['TROUBLE_SHOOTING']['GET_DESCRIPTION'])
-                images_size = request.POST.get(cf['TROUBLE_SHOOTING']['GET_IMAGES_SIZE'])
+                # images_size = request.POST.get(cf['TROUBLE_SHOOTING']['GET_IMAGES_SIZE'])
                 logs_size = request.POST.get(cf['TROUBLE_SHOOTING']['GET_LOGS_SIZE'])
 
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TEMPLATE'], id=template_id)['_source']
                 res = json.loads(re.sub(r'\"topic\"', '"Status": "active", "Executor": "pending", "style": {"fontWeight": "bold", "color": "#f39c11"}, "topic"', json.dumps(res)))
                 res['template_id'] = template_id
-                res['Description'] = description
+                res['Description'] = json.loads(description)
                 res['Status'] = cf['TROUBLE_SHOOTING']['STATUS_ACTIVE']
                 res['Date'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 res = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body=res)
 
-                if int(images_size) > 0:
-                    base64_images = []
-                    for i in range(0, int(images_size)):
-                        image = request.FILES.get(cf['TROUBLE_SHOOTING']['GET_IMAGES']+'_'+str(i))
-                        base64_images.append({'uuid': uuid.uuid1().hex, 'username': username, 'name': image.name, 'created_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'content': image_to_base64(image)})
-                    data = {'task_id': res['_id'], 'node_id': 'root', 'content': base64_images}
-                    _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], body=data)
+                # if int(images_size) > 0:
+                #     base64_images = []
+                #     for i in range(0, int(images_size)):
+                #         image = request.FILES.get(cf['TROUBLE_SHOOTING']['GET_IMAGES']+'_'+str(i))
+                #         base64_images.append({'uuid': uuid.uuid1().hex, 'username': username, 'name': image.name, 'created_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'content': image_to_base64(image)})
+                #     data = {'task_id': res['_id'], 'node_id': 'root', 'content': base64_images}
+                #     _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], body=data)
 
                 if int(logs_size) > 0:
                     logs = []
@@ -320,12 +321,12 @@ def save(request):
                 if len(res) > 0:
                     _id = res[0]['_id']
                     res = res[0]['_source']
-                    comment = request.POST.get(cf['TROUBLE_SHOOTING']['GET_COMMENTS'])
+                    comment = json.loads(request.POST.get(cf['TROUBLE_SHOOTING']['GET_COMMENTS']))
                     res['content'].append({'uuid': uuid.uuid1().hex, 'username': username, 'created_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'content': comment})
                     _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_COMMENTS'], id=_id, body={'doc': res})
                 else:
                     comments = []
-                    comment = request.POST.get(cf['TROUBLE_SHOOTING']['GET_COMMENTS'])
+                    comment = json.loads(request.POST.get(cf['TROUBLE_SHOOTING']['GET_COMMENTS']))
                     comments.append({'uuid': uuid.uuid1().hex, 'username': username, 'created_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'content': comment})
                     data = {'task_id': template_id, 'node_id': node_id, 'content': comments}
                     _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_COMMENTS'], body=data)
