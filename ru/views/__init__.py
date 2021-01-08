@@ -27,4 +27,4 @@ else:
 
 es_ctrl = Elasticsearch([{'host': server_address, 'port': 9200}])
 
-#elasticdump --input=http://localhost:9200/pages --output=http://10.166.152.49/es/pages  --type=data
+#elasticdump --input=http://10.166.152.49:9200/pages --output=http://10.166.152.49:9201/pages  --type=data
