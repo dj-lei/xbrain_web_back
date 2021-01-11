@@ -2,9 +2,9 @@ import gzip
 import base64
 from PIL import Image
 from io import BytesIO
-from Crypto.Cipher import AES
-from Crypto.Random import get_random_bytes
-from Crypto.PublicKey import RSA
+# from Crypto.Cipher import AES
+# from Crypto.Random import get_random_bytes
+# from Crypto.PublicKey import RSA
 
 
 def query_dict(key, value):
@@ -60,17 +60,17 @@ def file_decompress(file):
     return gzip.decompress(eval(file))
 
 
-def new_rsa_keys(bit):
-    key = RSA.generate(bit)
-    private_key = key.export_key()
-    file_out = open("private.pem", "wb")
-    file_out.write(private_key)
-    file_out.close()
-
-    public_key = key.publickey().export_key()
-    file_out = open("receiver.pem", "wb")
-    file_out.write(public_key)
-    file_out.close()
+# def new_rsa_keys(bit):
+#     key = RSA.generate(bit)
+#     private_key = key.export_key()
+#     file_out = open("private.pem", "wb")
+#     file_out.write(private_key)
+#     file_out.close()
+#
+#     public_key = key.publickey().export_key()
+#     file_out = open("receiver.pem", "wb")
+#     file_out.write(public_key)
+#     file_out.close()
 
 
 # def rsa_encrypt(text, public_key):
