@@ -24,7 +24,7 @@ urlpatterns = [
     path('feedback/get', feedback_views.get),
     path('babel/save', babel_views.save),
     path('babel/get', babel_views.get),
-	path('user_management/get', user_management_views.get),
+    path('user_management/get', user_management_views.get),
     path('user_management/save', user_management_views.save),
     path('page_management/get', page_management_views.get),
     path('page_management/save', page_management_views.save),

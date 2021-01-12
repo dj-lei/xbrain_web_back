@@ -23,12 +23,6 @@ def get(request):
                 user_id = request.GET.get(cf['ADMIN']['USER_ID'])
                 res = es_ctrl.delete(index=cf['ADMIN']['ES_INDEX'], id=user_id)
                 return JsonResponse({'content': 'Success'})
-            # elif operate == cf['ADMIN']['GET_ALL_PROJECTS']:
-            #     res = es_ctrl.search(index=cf['ADMIN']['ES_INDEX_PAGES'])['hits']['hits']
-            #     projects = []
-            #     for elm in res:
-            #         projects.append(elm['_source']['project'])
-            #     return JsonResponse({'content': projects})
             elif operate == cf['ADMIN']['get_the_roles']:
                 project = request.GET.get(cf['ADMIN']['PROJECT'])
                 res = es_ctrl.search(index=cf['ADMIN']['ES_INDEX_PAGES'], body={"query": {"match": {"project": project}}})['hits']['hits'][0]['_source']
@@ -53,30 +47,6 @@ def get(request):
         return HttpResponse(404)
     except Exception as e:
         traceback.print_exc()
-
-
-# def search(request):
-#     try:
-#         if request.method == 'GET':
-#             operate = request.GET.get(cf['ADMIN']['OPERATE'])
-#             keywords = request.GET.get(cf['ADMIN']['KEYWORDS']) + '*'
-#             if operate == cf['ADMIN']['GET_SPECIFY_USER']:
-#                 data = es_ctrl.search(index=cf['ADMIN']['ES_INDEX'],
-#                                       body={"query": {"wildcard": {"username": keywords}}}, size=1000)['hits']['hits']
-#                 result = []
-#                 for elm in data:
-#                     result.append({'id': elm['_id'], 'authority': elm['_source']['authority'],
-#                                    'roles': '', 'username': elm['_source']['username']})
-#                     for e in elm['_source']['groups']:
-#                         result[-1]['roles'] = result[-1]['roles'] + e['project'] + '-' + e['role'] + ' '
-#                     if result[-1]['roles'] == '':
-#                         result[-1]['roles'] = 'No roles'
-#                     else:
-#                         result[-1]['roles'] = result[-1]['roles'][:-1]
-#                 return JsonResponse({'content': result})
-#         return HttpResponse(404)
-#     except Exception as e:
-#         traceback.print_exc()
 
 
 def save(request):
