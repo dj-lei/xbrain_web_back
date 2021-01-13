@@ -37,12 +37,16 @@ def get(request):
                 flag = 0
                 for user in res_admin:
                     if user['_source']['groups']:
-                        for group in user['_source']['groups']:
+                        for index, group in enumerate(user['_source']['groups']):
                             if group['project'] == project_name and group['role'] not in current_role_project and group['role'] != 'all':
-                                group['role'] = "visitor"
+                                if {'project': project_name, 'role': 'visitor'} in user['_source']['groups']:
+                                    user['_source']['groups'].pop(index)
+                                else:
+                                    group['role'] = 'visitor'
                                 flag = 1
                                 break
                         if flag:
+
                             es_ctrl.update(index=cf['ADMIN']['ES_INDEX'], id=user['_id'],
                                            body={"doc": {"groups": user['_source']['groups']}})
                 return JsonResponse({'content': 'Success'})
@@ -131,9 +135,12 @@ def save(request):
                 flag = 0
                 for user in res_admin:
                     if user['_source']['groups']:
-                        for group in user['_source']['groups']:
+                        for index, group in enumerate(user['_source']['groups']):
                             if group['project'] == project_name and group['role'] not in current_role_project and group['role'] != 'all':
-                                group['role'] = "visitor"
+                                if {'project': project_name, 'role': 'visitor'} in user['_source']['groups']:
+                                    user['_source']['groups'].pop(index)
+                                else:
+                                    group['role'] = 'visitor'
                                 flag = 1
                                 break
                         if flag:
