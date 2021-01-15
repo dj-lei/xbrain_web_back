@@ -9,15 +9,30 @@ def get(request):
                 res = es_ctrl.search(index=cf['BABEL']['ES_INDEX_SYMBOLS'])
                 data = res['hits']['hits']
                 result = []
+                symbols = []
                 if len(data) > 0:
                     for elm in data:
                         result.append({'id': elm['_id'], 'SymbolName': elm['_source']['symbol_name'], 'Icon': '',
                                        'Category': elm['_source']['category'], 'CreatedTime': elm['_source']['created_time']})
-                return JsonResponse({'content': result})
+                    tmp = []
+                    for elm in data:
+                        tmp.append(elm['_source']['category'])
+                    tmp = set(tmp)
+                    for t in set(tmp):
+                        temp = []
+                        for elm in data:
+                            if t == elm['_source']['category']:
+                                temp.append({'id': elm['_id'], 'symbol': elm['_source']['symbol_name']})
+                        symbols.append({'title': t, 'symbols': temp})
+                return JsonResponse({'content': result, 'symbols': symbols})
             elif operate == cf['BABEL']['GET_SYMBOL']:
                 symbol_id = request.GET.get(cf['BABEL']['SYMBOL_ID'])
                 res = es_ctrl.get(index=cf['BABEL']['ES_INDEX_SYMBOLS'], id=symbol_id)
                 return JsonResponse({'content': res['_source'], 'id': symbol_id})
+            elif operate == cf['BABEL']['DELETE_SYMBOL']:
+                symbol_id = request.GET.get(cf['BABEL']['SYMBOL_ID'])
+                _ = es_ctrl.delete(index=cf['BABEL']['ES_INDEX_SYMBOLS'], id=symbol_id)
+                return JsonResponse({'content': 'Success'})
         return HttpResponse(404)
     except Exception as e:
         traceback.print_exc()
