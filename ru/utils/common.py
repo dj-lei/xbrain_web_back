@@ -60,6 +60,39 @@ def file_decompress(file):
     return gzip.decompress(eval(file))
 
 
+def babel_test_data():
+    tmp = [
+        {
+          'id': 1,
+          'name': 'Radon',
+          'children': [
+            {'id': 2, 'name': 'Calendar', 'value':'kk1', 'type':'string', 'range':'""'},
+            {'id': 3, 'name': 'Chrome', 'value':15, 'type':'int', 'range':[1,20] },
+            {'id': 4, 'name': 'Webstorm', 'value':'a', 'type':'list', 'range':['a','b','c'] },
+          ],
+        },
+        {
+          'id': 5,
+          'name': 'Xilinx',
+          'children': [
+            {
+              'id': 6,
+              'name': 'vuetify',
+              'children': [
+                {
+                  'id': 7,
+                  'name': 'src',
+                  'children': [
+                    { 'id': 8, 'name': 'index' , 'value':'kk1', 'type':'string', 'range':'""'},
+                    { 'id': 9, 'name': 'bootstrap' , 'value':'kk1', 'type':'string', 'range':'""'},
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    return tmp
 # def new_rsa_keys(bit):
 #     key = RSA.generate(bit)
 #     private_key = key.export_key()

@@ -33,6 +33,8 @@ def get(request):
                 symbol_id = request.GET.get(cf['BABEL']['SYMBOL_ID'])
                 _ = es_ctrl.delete(index=cf['BABEL']['ES_INDEX_SYMBOLS'], id=symbol_id)
                 return JsonResponse({'content': 'Success'})
+            elif operate == cf['BABEL']['GET_TEST_DATA']:
+                return JsonResponse({'content': babel_test_data()[0]})
         return HttpResponse(404)
     except Exception as e:
         traceback.print_exc()
