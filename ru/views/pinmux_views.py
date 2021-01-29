@@ -1,5 +1,5 @@
+import random
 from ru.views import *
-
 from ru.utils.create_pinmux_config_one_click_9_18 import PinmuxConfig
 
 
@@ -32,6 +32,24 @@ def get(request):
                 b = es_ctrl.get(index=cf['PINMUX']['ES_INDEX'], id=template_id_b)['_source']['File'].split('\n')
                 content = difflib.HtmlDiff().make_file(a, b, context=True, numlines=5).replace('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '&nbsp;&nbsp;')
                 return HttpResponse(content)
+            elif operate == cf['PINMUX']['GET_CHECK_CODE']:
+                phone = request.GET.get(cf['PINMUX']['PHONE'])
+                check_code = random.randint(0, 9999)
+                _ = es_ctrl.index(index='check-code', body={'phone': phone, 'check_code': check_code, 'count': 0}, id=str(phone))
+                return JsonResponse({'check_code': check_code})
+            elif operate == cf['PINMUX']['CHECK']:
+                code = request.GET.get(cf['PINMUX']['CHECK_CODE'])
+                phone = request.GET.get(cf['PINMUX']['PHONE'])
+                tmp = es_ctrl.get(index='check-code', id=phone)['_source']
+                # print(tmp)
+                # tmp['count'] = tmp['count'] + 1
+                # _ = es_ctrl.update(index='check-code', body={'doc': tmp}, id=phone)
+                # if tmp['count'] > 10:
+                #     return JsonResponse({'content': 'over count!'})
+                if int(code) == tmp['check_code']:
+                    return JsonResponse({'content': 'Success'})
+                else:
+                    return JsonResponse({'content': 'failed'})
         return HttpResponse(404)
     except Exception as e:
         traceback.print_exc()

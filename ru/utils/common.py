@@ -1,5 +1,6 @@
 import gzip
 import base64
+import math
 from PIL import Image
 from io import BytesIO
 # from Crypto.Cipher import AES
@@ -83,8 +84,27 @@ def babel_test_data():
                   'id': 7,
                   'name': 'src',
                   'children': [
-                    { 'id': 8, 'name': 'index' , 'value':'kk1', 'type':'string', 'range':'""'},
-                    { 'id': 9, 'name': 'bootstrap' , 'value':'kk1', 'type':'string', 'range':'""'},
+                    { 'id': 8, 'name': 'index' , 'value':{
+                        'title': {'text': 'Line Chart'},
+                        'tooltip': {},
+                        'toolbox': {
+                            'feature': {
+                                'dataView': {},
+                                'saveAsImage': {
+                                    'pixelRatio': 2
+                                },
+                                'restore': {}
+                            }
+                        },
+                        'xAxis': {},
+                        'yAxis': {},
+                        'series': [{
+                            'type': 'line',
+                            'smooth': True,
+                            'data': [[12, 5], [24, 20], [36, 36], [48, 10], [60, 10], [72, 20]]
+                        }]
+                    }, 'type':'echarts', 'range':'""'},
+                    {'id': 9, 'name': 'bootstrap' , 'value':'kk1', 'type':'echarts', 'range':'""'},
                   ],
                 },
               ],
@@ -93,6 +113,40 @@ def babel_test_data():
         },
       ],
     return tmp
+
+
+def babel_test_he_status(): # status: free,holding,ready
+    tmp = [
+        {'id': 'a', 'name': 'hardware_environment1', 'status': 'free', 'is_data_updated': False},
+        {'id': 'b', 'name': 'hardware_environment2', 'status': 'holding', 'is_data_updated': False},
+        {'id': 'c', 'name': 'hardware_environment3', 'status': 'ready', 'is_data_updated': True}
+    ],
+    return tmp
+
+
+def babel_test_he_data(): # status: free,holding,ready
+    tmp = {
+        [{'id': 'a', 'name': 'hardware_environment1', 'status': 'free', 'is_data_updated': False}],
+        [{'id': 'b', 'name': 'hardware_environment2', 'status': 'holding', 'is_data_updated': False}],
+        [{'id': 'c', 'name': 'hardware_environment3', 'status': 'ready', 'is_data_updated': True}],
+    }
+    return tmp
+
+
+# def cal_sin():
+#     x = float_range(-1, 1, 0.1)
+#     y = float_range(-1, 1, 0.1)
+#     return math.sin(x * math.pi) * math.sin(y * math.pi)
+#
+#
+# def float_range(i:float, j:float, k=1)->list:
+#     xlen=str((len(str(k-int(k)))-2)/10)+"f"
+#     # print("xlen=",xlen)
+#     lista=[]
+#     while i<j:
+#         lista.append(format(i, xlen))
+#         i+=k
+#     return lista
 # def new_rsa_keys(bit):
 #     key = RSA.generate(bit)
 #     private_key = key.export_key()
