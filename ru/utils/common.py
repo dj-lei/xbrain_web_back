@@ -1,5 +1,6 @@
 import gzip
 import base64
+import random
 import math
 from PIL import Image
 from io import BytesIO
@@ -61,50 +62,55 @@ def file_decompress(file):
     return gzip.decompress(eval(file))
 
 
+def echarts_test_data(data=[[12, 5], [24, 20], [36, 36], [48, 10], [60, 10], [72, 20]]):
+    option = {
+        'title': {'text': 'Line Chart'},
+        'tooltip': {},
+        'toolbox': {
+            'feature': {
+                'dataView': {},
+                'saveAsImage': {
+                    'pixelRatio': 2
+                },
+                'restore': {}
+            }
+        },
+        'xAxis': {},
+        'yAxis': {},
+        'series': [{
+            'type': 'line',
+            'smooth': True,
+            'data': data
+        }]
+    }
+    return option
+
+
 def babel_test_data():
     tmp = [
         {
-          'id': 1,
+          'id': 'aa',
           'name': 'Radon',
           'children': [
-            {'id': 2, 'name': 'Calendar', 'value':'kk1', 'type':'string', 'range':'""'},
-            {'id': 3, 'name': 'Chrome', 'value':15, 'type':'int', 'range':[1,20] },
-            {'id': 4, 'name': 'Webstorm', 'value':'a', 'type':'list', 'range':['a','b','c'] },
+            {'id': 'bb', 'name': 'Calendar', 'value':'kk1', 'type':'string', 'range':'""'},
+            {'id': 'cc', 'name': 'Chrome', 'value':15, 'type':'int', 'range':[1,20] },
+            {'id': 'dd', 'name': 'Webstorm', 'value':'a', 'type':'list', 'range':['a','b','c'] },
           ],
         },
         {
-          'id': 5,
+          'id': 'ee',
           'name': 'Xilinx',
           'children': [
             {
-              'id': 6,
+              'id': 'ff',
               'name': 'vuetify',
               'children': [
                 {
-                  'id': 7,
+                  'id': 'gg',
                   'name': 'src',
                   'children': [
-                    { 'id': 8, 'name': 'index' , 'value':{
-                        'title': {'text': 'Line Chart'},
-                        'tooltip': {},
-                        'toolbox': {
-                            'feature': {
-                                'dataView': {},
-                                'saveAsImage': {
-                                    'pixelRatio': 2
-                                },
-                                'restore': {}
-                            }
-                        },
-                        'xAxis': {},
-                        'yAxis': {},
-                        'series': [{
-                            'type': 'line',
-                            'smooth': True,
-                            'data': [[12, 5], [24, 20], [36, 36], [48, 10], [60, 10], [72, 20]]
-                        }]
-                    }, 'type':'echarts', 'range':'""'},
-                    {'id': 9, 'name': 'bootstrap' , 'value':'kk1', 'type':'echarts', 'range':'""'},
+                    { 'id': 'hh', 'name': 'index' , 'value':echarts_test_data(), 'type':'echarts', 'range':'""'},
+                    {'id': 'jj', 'name': 'bootstrap' , 'value':'kk1', 'type':'echarts', 'range':'""'},
                   ],
                 },
               ],
@@ -125,11 +131,38 @@ def babel_test_he_status(): # status: free,holding,ready
 
 
 def babel_test_he_data(): # status: free,holding,ready
-    tmp = {
-        [{'id': 'a', 'name': 'hardware_environment1', 'status': 'free', 'is_data_updated': False}],
-        [{'id': 'b', 'name': 'hardware_environment2', 'status': 'holding', 'is_data_updated': False}],
-        [{'id': 'c', 'name': 'hardware_environment3', 'status': 'ready', 'is_data_updated': True}],
-    }
+    tmp = [
+        {
+            'hardware_environment_name': 'hardware_environment1',
+            'data': [
+                {'id': 'aa', 'value': random.randint(0, 999)},
+                {'id': 'bb', 'value': random.randint(0, 999)},
+                {'id': 'cc', 'value': random.randint(0, 999)},
+                {'id': 'dd', 'value': random.randint(0, 999)},
+                {'id': 'ee', 'value': random.randint(0, 999)},
+                {'id': 'ff', 'value': random.randint(0, 999)},
+                {'id': 'gg', 'value': random.randint(0, 999)},
+                {'id': 'hh',
+                 'value': echarts_test_data([[random.randint(0, 50), random.randint(0, 50)] for i in range(0, 6)])},
+                {'id': 'jj', 'value': random.randint(0, 999)},
+            ]
+        },
+        {
+            'hardware_environment_name': 'hardware_environment3',
+            'data': [
+                {'id': 'aa', 'value': random.randint(0, 999)},
+                {'id': 'bb', 'value': random.randint(0, 999)},
+                {'id': 'cc', 'value': random.randint(0, 999)},
+                {'id': 'dd', 'value': random.randint(0, 999)},
+                {'id': 'ee', 'value': random.randint(0, 999)},
+                {'id': 'ff', 'value': random.randint(0, 999)},
+                {'id': 'gg', 'value': random.randint(0, 999)},
+                {'id': 'hh',
+                 'value': echarts_test_data([[random.randint(0, 50), random.randint(0, 50)] for i in range(0, 6)])},
+                {'id': 'jj', 'value': random.randint(0, 999)},
+            ]
+        },
+    ]
     return tmp
 
 

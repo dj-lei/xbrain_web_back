@@ -46,12 +46,16 @@ def get(request):
                 viewer_id = request.GET.get(cf['BABEL']['VIEWER_ID'])
                 res = es_ctrl.get(index=cf['BABEL']['ES_INDEX_VIEWERS'], id=viewer_id)
                 return JsonResponse({'content': res['_source'], 'id': viewer_id})
+            elif operate == cf['BABEL']['DELETE_VIEWER']:
+                viewer_id = request.GET.get(cf['BABEL']['VIEWER_ID'])
+                _ = es_ctrl.delete(index=cf['BABEL']['ES_INDEX_VIEWERS'], id=viewer_id)
+                return JsonResponse({'content': 'Success'})
             elif operate == cf['BABEL']['GET_TEST_DATA']:
                 return JsonResponse({'content': babel_test_data()[0]})
             elif operate == cf['BABEL']['HARDWARE_ENVIRONMENT_READ_STATUS']:
                 return JsonResponse({'content': babel_test_he_status()[0]})
             elif operate == cf['BABEL']['HARDWARE_ENVIRONMENT_READ_DATA']:
-                return JsonResponse({'content': babel_test_he_data()[0]})
+                return JsonResponse({'content': babel_test_he_data()})
         return HttpResponse(404)
     except Exception as e:
         traceback.print_exc()
@@ -83,10 +87,10 @@ def save(request):
                 viewer_id = request.POST.get(cf['BABEL']['VIEWER_ID'])
                 res = es_ctrl.get(index=cf['BABEL']['ES_INDEX_VIEWERS'], id=viewer_id)['_source']
                 res['content'] = data
-                _ = es_ctrl.update(index=cf['BABEL']['ES_INDEX_SYMBOLS'], body={'doc': res}, id=viewer_id)
+                _ = es_ctrl.update(index=cf['BABEL']['ES_INDEX_VIEWERS'], body={'doc': res}, id=viewer_id)
                 return JsonResponse({'content': 'Success'})
             elif operate == cf['BABEL']['HARDWARE_ENVIRONMENT_SAVE_CONFIG']:
-                return JsonResponse({'content': babel_test_data()[0]})
+                return JsonResponse({'content': babel_test_he_status()[0]})
         return HttpResponse(404)
     except Exception as e:
         traceback.print_exc()
