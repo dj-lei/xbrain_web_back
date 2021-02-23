@@ -8,12 +8,12 @@ def mind_get_list(node_data):
             if elm.__contains__('children'):
                 temp.extend(mind_get_list(elm['children']))
             else:
-                temp.append([elm['id'], elm['topic'], elm['Status'], elm['Executor']])
+                temp.append([elm['id'], elm['topic'], elm['Status'], elm['Schedule']])
     else:
         if node_data.__contains__('children'):
             temp.extend(mind_get_list(node_data['children']))
         else:
-            temp.append([node_data['id'], node_data['topic'], node_data['Status'], node_data['Executor']])
+            temp.append([node_data['id'], node_data['topic'], node_data['Status'], node_data['Schedule']])
     return temp
 
 
@@ -82,12 +82,12 @@ def mind_export_to_csv(node_data, node=None):
             if elm.__contains__('children'):
                 temp.extend(mind_export_to_csv(elm['children'], node+'/'+elm['topic']))
             else:
-                temp.append([elm['topic'], node, elm['Status'], elm['Executor']])
+                temp.append([elm['topic'], node, elm['Status'], elm['Schedule']])
     else:
         if node_data.__contains__('children'):
             temp.extend(mind_export_to_csv(node_data['children'], node+'/'+node_data['topic']))
         else:
-            temp.append([node_data['topic'], node, node_data['Status'], node_data['Executor']])
+            temp.append([node_data['topic'], node, node_data['Status'], node_data['Schedule']])
     return temp
 
 

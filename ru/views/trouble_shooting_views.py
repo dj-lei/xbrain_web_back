@@ -80,7 +80,7 @@ def get(request):
                 data = mind_get_list(mind_search_id(res['_source']['nodeData'], node_id))
                 result = []
                 for elm in data:
-                    result.append({'id': elm[0], 'Task': elm[1], 'Status': elm[2], 'Executor': elm[3]})
+                    result.append({'id': elm[0], 'Task': elm[1], 'Status': elm[2], 'Schedule': elm[3]})
                 return JsonResponse({'content': result, 'id': template_id})
             elif operate == cf['TROUBLE_SHOOTING']['GET_TASK_IMAGES']:
                 template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
@@ -162,7 +162,8 @@ def get(request):
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)
                 data = res['_source']['nodeData']['children']
                 temp = mind_export_to_csv(data)
-                temp = pd.DataFrame(temp, columns=['Tasks', 'Responsible', 'Achieved', 'Executor'])
+                temp = pd.DataFrame(temp, columns=['Tasks', 'Responsible', 'Status', 'Schedule'])
+                temp['Status'] = temp['Status'].map({0: 'GoOn', 1: 'Done', 2: 'Uncertain', 3: 'Shooting'})
 
                 excel_file = BytesIO()
                 xlwriter = pd.ExcelWriter(excel_file, engine='xlsxwriter')
@@ -223,14 +224,25 @@ def save(request):
                     res['nodeData'] = mind_update_checklist_shooting(res['nodeData'], select['id'], username, 'close')
                 _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body={'doc': res}, id=template_id)
                 return JsonResponse({'content': res})
-            elif operate == cf['TROUBLE_SHOOTING']['SHOOTING']:
+            elif operate == cf['TROUBLE_SHOOTING']['APPLY']:
                 template_id = request.POST.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
                 selected = request.POST.get(cf['TROUBLE_SHOOTING']['SELECT_TASK'])
                 username = request.POST.get(cf['TROUBLE_SHOOTING']['USERNAME'])
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)['_source']
 
                 for select in json.loads(selected):
-                    res['nodeData'] = mind_update_checklist_shooting(res['nodeData'], select['id'], username, 'shooting')
+                    temp = mind_search_id(res['nodeData'], select['id'])
+                    temp['Schedule'] = select['Schedule']
+                    temp['Status'] = select['Status']
+                    if select['Status'] == 0:
+                        temp['style'] = {"fontWeight": "bold", "color": "#f39c11"}
+                    elif select['Status'] == 1:
+                        temp['style'] = {"fontWeight": "bold", "color": "#00FF00"}
+                    elif select['Status'] == 2:
+                        temp['style'] = {"fontWeight": "bold", "color": "#C0C0C0"}
+                    elif select['Status'] == 3:
+                        temp['style'] = {"fontWeight": "bold", "color": "#FF0000"}
+                    res = json.loads(re.sub(json.dumps(mind_search_id(res['nodeData'], select['id'])), json.dumps(temp), json.dumps(res)))
                 _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body={'doc': res}, id=template_id)
                 return JsonResponse({'content': res})
             elif operate == cf['TROUBLE_SHOOTING']['RELEASE_TASK']:
@@ -241,7 +253,7 @@ def save(request):
                 logs_size = request.POST.get(cf['TROUBLE_SHOOTING']['GET_LOGS_SIZE'])
 
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TEMPLATE'], id=template_id)['_source']
-                res = json.loads(re.sub(r'\"topic\"', '"Status": "active", "Executor": "pending", "style": {"fontWeight": "bold", "color": "#f39c11"}, "topic"', json.dumps(res)))
+                res = json.loads(re.sub(r'\"topic\"', '"Status": 0, "Schedule":0, "Executor": "pending", "style": {"fontWeight": "bold", "color": "#f39c11"}, "topic"', json.dumps(res)))
                 res['template_id'] = template_id
                 res['Description'] = json.loads(description)
                 res['Status'] = cf['TROUBLE_SHOOTING']['STATUS_ACTIVE']
