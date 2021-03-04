@@ -155,7 +155,6 @@ def get(request):
                     res = res[0]['_source']['content']
                     for elm in res:
                         result.append({'uuid': elm['uuid'], 'username': elm['username'], 'created_time': elm['created_time'], 'comment': elm['content']})
-                print(len(res))
                 return JsonResponse({'content': result})
             elif operate == cf['TROUBLE_SHOOTING']['EXPORT_TASK']:
                 template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])

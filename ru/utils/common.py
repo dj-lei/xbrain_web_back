@@ -92,13 +92,18 @@ def babel_test_data():
           'id': 'aa',
           'name': 'Radon',
           'children': [
-            {'id': 'bb', 'name': 'Calendar', 'value':'kk1', 'type':'string', 'range':'""'},
-            {'id': 'cc', 'name': 'Chrome', 'value':15, 'type':'int', 'range':[1,20] },
-            {'id': 'dd', 'name': 'Webstorm', 'value':'a', 'type':'list', 'range':['a','b','c'] },
+            {'id': 'bb', 'name': 'Calendar', 'value':5, 'type':'int', 'range':'""'},
+            {'id': 'cc', 'name': 'Chrome', 'value':15, 'type':'int', 'range':[1,20]},
+            {'id': 'dd', 'name': 'Webstorm', 'value':10, 'type':'int', 'range':[1,20]},
+            {'id': 'ee', 'name': 'Firefox', 'value': 20, 'type': 'int', 'range': [1,20]},
+            {'id': 'interactive.Param', 'name': 'Param', 'value': 'var', 'type': 'text', 'range': '""'},
+            {'id': 'interactive.layer', 'name': 'layer', 'value': '1', 'type': 'list', 'range': ['1', '2', '3']},
+            {'id': 'interactive.select', 'name': 'select', 'value': '1', 'type': 'express', 'range': '""'}
+            # 'api': 'http://localhost:8000/ru/babel/get?operate=get_interactive_data&interactive.layer=1&interactive.Param=abc'}
           ],
         },
         {
-          'id': 'ee',
+          'id': 'eee',
           'name': 'Xilinx',
           'children': [
             {
@@ -130,40 +135,11 @@ def babel_test_he_status(): # status: free,holding,ready
     return tmp
 
 
-def babel_test_he_data(): # status: free,holding,ready
-    tmp = [
-        {
-            'hardware_environment_name': 'hardware_environment1',
-            'data': [
-                {'id': 'aa', 'value': random.randint(0, 999)},
-                {'id': 'bb', 'value': random.randint(0, 999)},
-                {'id': 'cc', 'value': random.randint(0, 999)},
-                {'id': 'dd', 'value': random.randint(0, 999)},
-                {'id': 'ee', 'value': random.randint(0, 999)},
-                {'id': 'ff', 'value': random.randint(0, 999)},
-                {'id': 'gg', 'value': random.randint(0, 999)},
-                {'id': 'hh',
-                 'value': echarts_test_data([[random.randint(0, 50), random.randint(0, 50)] for i in range(0, 6)])},
-                {'id': 'jj', 'value': random.randint(0, 999)},
-            ]
-        },
-        {
-            'hardware_environment_name': 'hardware_environment3',
-            'data': [
-                {'id': 'aa', 'value': random.randint(0, 999)},
-                {'id': 'bb', 'value': random.randint(0, 999)},
-                {'id': 'cc', 'value': random.randint(0, 999)},
-                {'id': 'dd', 'value': random.randint(0, 999)},
-                {'id': 'ee', 'value': random.randint(0, 999)},
-                {'id': 'ff', 'value': random.randint(0, 999)},
-                {'id': 'gg', 'value': random.randint(0, 999)},
-                {'id': 'hh',
-                 'value': echarts_test_data([[random.randint(0, 50), random.randint(0, 50)] for i in range(0, 6)])},
-                {'id': 'jj', 'value': random.randint(0, 999)},
-            ]
-        },
-    ]
-    return tmp
+def babel_test_he_data(seed, key): # status: free,holding,ready
+    temp = {}
+    for k in key.split(','):
+        temp[k] = random.randint(10 ** seed, 9 + 10 ** seed)
+    return temp
 
 
 # def cal_sin():

@@ -52,17 +52,19 @@ def get(request):
                 _ = es_ctrl.delete(index=cf['BABEL']['ES_INDEX_VIEWERS'], id=viewer_id)
                 return JsonResponse({'content': 'Success'})
             elif operate == cf['BABEL']['GET_TEST_DATA']:
-                content = requests.get('http://10.166.152.40/ru/docman/get')
+                # content = requests.get('http://10.166.152.40/ru/docman/get')
                 # test = eval(content.content.decode())['content']
                 # temp = base64.b64decode(test[0])
-                return JsonResponse(eval(content.content.decode()))
+                # return JsonResponse(eval(content.content.decode()))
+                return JsonResponse({'content': babel_test_data()[0]})
                 # return JsonResponse({'content': gzip.decompress(temp).decode()})
             elif operate == cf['BABEL']['HARDWARE_ENVIRONMENT_READ_STATUS']:
-                content = requests.get('http://10.166.152.40/ru/deviceman/get')
-                return JsonResponse(eval(content.content.decode()))
-                # return JsonResponse({'content': babel_test_he_status()[0]})
-            elif operate == cf['BABEL']['HARDWARE_ENVIRONMENT_READ_DATA']:
-                return JsonResponse({'content': babel_test_he_data()})
+                # content = requests.get('http://10.166.152.40/ru/deviceman/get')
+                # return JsonResponse(eval(content.content.decode()))
+                return JsonResponse({'content': babel_test_he_status()[0]})
+            elif operate == cf['BABEL']['GET_INTERACTIVE_DATA']:
+                os.environ['SEED'] = request.GET.get('interactive.layer')
+                return JsonResponse({'content': 'success'})
         return HttpResponse(404)
     except Exception as e:
         traceback.print_exc()
@@ -97,12 +99,14 @@ def save(request):
                 _ = es_ctrl.update(index=cf['BABEL']['ES_INDEX_VIEWERS'], body={'doc': res}, id=viewer_id)
                 return JsonResponse({'content': 'Success'})
             elif operate == cf['BABEL']['HARDWARE_ENVIRONMENT_SAVE_CONFIG']:
-                file_dict = request.POST.items()
-                data = {}
-                for (k, v) in file_dict:
-                    data[k] = (None, v)
-                res = requests.post('http://10.166.152.40/ru/docman/value', files=data)
-                return JsonResponse({'content': json.loads(res.content)})
+                key = request.POST.get('key')
+                # file_dict = request.POST.items()
+                # data = {}
+                # for (k, v) in file_dict:
+                #     data[k] = (None, v)
+                # res = requests.post('http://10.166.152.40/ru/docman/value', files=data)
+                # return JsonResponse({'content': json.loads(res.content)})
+                return JsonResponse({'content': babel_test_he_data(int(os.getenv('SEED', 1)), key)})
         return HttpResponse(404)
     except Exception as e:
         traceback.print_exc()
