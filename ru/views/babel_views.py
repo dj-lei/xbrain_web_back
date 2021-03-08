@@ -87,17 +87,31 @@ def save(request):
                 res['content'] = data
                 _ = es_ctrl.update(index=cf['BABEL']['ES_INDEX_SYMBOLS'], body={'doc': res}, id=symbol_id)
                 return JsonResponse({'content': 'Success'})
+            elif operate == cf['BABEL']['SAVE_API_BIND_DATA']:
+                symbol_id = request.POST.get(cf['BABEL']['SYMBOL_ID'])
+                api_url = request.POST.get(cf['BABEL']['API_URL'])
+                res = es_ctrl.get(index=cf['BABEL']['ES_INDEX_SYMBOLS'], id=symbol_id)['_source']
+                res['api_bind_data'] = api_url
+                _ = es_ctrl.update(index=cf['BABEL']['ES_INDEX_SYMBOLS'], body={'doc': res}, id=symbol_id)
+                return JsonResponse({'content': 'Success'})
+            elif operate == cf['BABEL']['SAVE_API_VIEWER']:
+                viewer_id = request.POST.get(cf['BABEL']['VIEWER_ID'])
+                api_url = request.POST.get(cf['BABEL']['API_URL'])
+                res = es_ctrl.get(index=cf['BABEL']['ES_INDEX_VIEWERS'], id=viewer_id)['_source']
+                res['api_viewer'] = api_url
+                _ = es_ctrl.update(index=cf['BABEL']['ES_INDEX_VIEWERS'], body={'doc': res}, id=viewer_id)
+                return JsonResponse({'content': 'Success'})
             elif operate == cf['BABEL']['VIEWER_NEW_ADD']:
                 viewer_name = request.POST.get(cf['BABEL']['VIEWER_NAME'])
-                _ = es_ctrl.index(index=cf['BABEL']['ES_INDEX_VIEWERS'], body={'viewer_name': viewer_name,
+                res = es_ctrl.index(index=cf['BABEL']['ES_INDEX_VIEWERS'], body={'viewer_name': viewer_name,
                         'created_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'content': data})
-                return JsonResponse({'content': 'Success'})
+                return JsonResponse({'content': 'Success', 'viewer_id': res['_id']})
             elif operate == cf['BABEL']['VIEWER_UPDATE']:
                 viewer_id = request.POST.get(cf['BABEL']['VIEWER_ID'])
                 res = es_ctrl.get(index=cf['BABEL']['ES_INDEX_VIEWERS'], id=viewer_id)['_source']
                 res['content'] = data
                 _ = es_ctrl.update(index=cf['BABEL']['ES_INDEX_VIEWERS'], body={'doc': res}, id=viewer_id)
-                return JsonResponse({'content': 'Success'})
+                return JsonResponse({'content': 'Success', 'viewer_id': viewer_id})
             elif operate == cf['BABEL']['HARDWARE_ENVIRONMENT_SAVE_CONFIG']:
                 key = request.POST.get('key')
                 # file_dict = request.POST.items()

@@ -32,7 +32,7 @@ def get(request):
                 if len(data) > 0:
                     for elm in data:
                         result.append({'id': elm['_id'], 'TaskName': elm['_source']['TemplateName'], 'Status': elm['_source']['Status'],
-                                       'Date': elm['_source']['Date']})
+                                       'Group': elm['_source']['Group'], 'Date': elm['_source']['Date']})
                 return JsonResponse({'content': result})
             elif operate == cf['TROUBLE_SHOOTING']['GET_TASK']:
                 template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
@@ -41,11 +41,11 @@ def get(request):
             elif operate == cf['TROUBLE_SHOOTING']['DELETE_TASK']:
                 template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
 
-                _id = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'],
-                                     body=query_with([['task_id', template_id]]))['hits']['hits']
-                if len(_id) > 0:
-                    for i in range(0, len(_id)):
-                        _ = es_ctrl.delete(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], id=_id[i]['_id'])
+                # _id = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'],
+                #                      body=query_with([['task_id', template_id]]))['hits']['hits']
+                # if len(_id) > 0:
+                #     for i in range(0, len(_id)):
+                #         _ = es_ctrl.delete(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], id=_id[i]['_id'])
 
                 _id = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'],
                                      body=query_with([['task_id', template_id]]))['hits']['hits']
@@ -82,17 +82,6 @@ def get(request):
                 for elm in data:
                     result.append({'id': elm[0], 'Task': elm[1], 'Status': elm[2], 'Schedule': elm[3]})
                 return JsonResponse({'content': result, 'id': template_id})
-            elif operate == cf['TROUBLE_SHOOTING']['GET_TASK_IMAGES']:
-                template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
-                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK_IMAGES'], body=query_dict('task_id', template_id))['hits']['hits'][0]['_source']['content']
-                return JsonResponse({'content': res})
-            elif operate == cf['TROUBLE_SHOOTING']['GET_TASK_LOGS']:
-                template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
-                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK_LOGS'], body=query_dict('task_id', template_id))['hits']['hits'][0]['_source']
-                response = HttpResponse(file_decompress(res['content']), 'application/txt')
-                response['Content-Disposition'] = res['name']
-                response['Access-Control-Expose-Headers'] = 'Content-Disposition'
-                return response
             elif operate == cf['TROUBLE_SHOOTING']['GET_CHECKLIST_IMAGES']:
                 template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
                 node_id = request.GET.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
@@ -247,25 +236,18 @@ def save(request):
             elif operate == cf['TROUBLE_SHOOTING']['RELEASE_TASK']:
                 template_id = request.POST.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
                 username = request.POST.get(cf['ADMIN']['USERNAME'])
+                group = request.POST.get(cf['TROUBLE_SHOOTING']['GROUP'])
                 description = request.POST.get(cf['TROUBLE_SHOOTING']['GET_DESCRIPTION'])
-                # images_size = request.POST.get(cf['TROUBLE_SHOOTING']['GET_IMAGES_SIZE'])
                 logs_size = request.POST.get(cf['TROUBLE_SHOOTING']['GET_LOGS_SIZE'])
 
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TEMPLATE'], id=template_id)['_source']
                 res = json.loads(re.sub(r'\"topic\"', '"Status": 0, "Schedule":0, "Executor": "pending", "style": {"fontWeight": "bold", "color": "#f39c11"}, "topic"', json.dumps(res)))
                 res['template_id'] = template_id
                 res['Description'] = json.loads(description)
+                res['Group'] = group
                 res['Status'] = cf['TROUBLE_SHOOTING']['STATUS_ACTIVE']
                 res['Date'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 res = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body=res)
-
-                # if int(images_size) > 0:
-                #     base64_images = []
-                #     for i in range(0, int(images_size)):
-                #         image = request.FILES.get(cf['TROUBLE_SHOOTING']['GET_IMAGES']+'_'+str(i))
-                #         base64_images.append({'uuid': uuid.uuid1().hex, 'username': username, 'name': image.name, 'created_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'content': image_to_base64(image)})
-                #     data = {'task_id': res['_id'], 'node_id': 'root', 'content': base64_images}
-                #     _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], body=data)
 
                 if int(logs_size) > 0:
                     logs = []
