@@ -32,7 +32,7 @@ def get(request):
                 if len(data) > 0:
                     for elm in data:
                         result.append({'id': elm['_id'], 'TaskName': elm['_source']['TemplateName'], 'Status': elm['_source']['Status'],
-                                       'Group': elm['_source']['Group'], 'Date': elm['_source']['Date']})
+                                       'Group': elm['_source']['Group'] if "Group" in elm['_source'].keys() else 'unknown', 'Date': elm['_source']['Date']})
                 return JsonResponse({'content': result})
             elif operate == cf['TROUBLE_SHOOTING']['GET_TASK']:
                 template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
@@ -78,6 +78,7 @@ def get(request):
                 node_id = request.GET.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)
                 data = mind_get_list(mind_search_id(res['_source']['nodeData'], node_id))
+                print(res['_source']['nodeData'])
                 result = []
                 for elm in data:
                     result.append({'id': elm[0], 'Task': elm[1], 'Status': elm[2], 'Schedule': elm[3]})
@@ -241,7 +242,7 @@ def save(request):
                 logs_size = request.POST.get(cf['TROUBLE_SHOOTING']['GET_LOGS_SIZE'])
 
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TEMPLATE'], id=template_id)['_source']
-                res = json.loads(re.sub(r'\"topic\"', '"Status": 0, "Schedule":0, "Executor": "pending", "style": {"fontWeight": "bold", "color": "#f39c11"}, "topic"', json.dumps(res)))
+                res = json.loads(re.sub(r'\"topic\"', '"Status": 0, "Schedule":0, "Executor": "pending", "style": {"fontWeight": "bold", "color": "#f39c11"}, "topic"', json.dumps(res)).replace(', \"children\": []', ''))
                 res['template_id'] = template_id
                 res['Description'] = json.loads(description)
                 res['Group'] = group
