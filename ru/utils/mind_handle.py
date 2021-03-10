@@ -171,8 +171,10 @@ def mind_update_template_to_task(updated_template, task):
                     updated_template[index]['Status'] = temp_dict['Status']
                     updated_template[index]['Executor'] = temp_dict['Executor']
                     updated_template[index]['style'] = temp_dict['style']
+                    updated_template[index]['Schedule'] = temp_dict['Schedule']
                 else:
-                    updated_template[index]['Status'] = 'active'
+                    updated_template[index]['Status'] = 0
+                    updated_template[index]['Schedule'] = 0
                     updated_template[index]['Executor'] = 'pending'
                     updated_template[index]['style'] = {"fontWeight": "bold", "color": "#f39c11"}
             else:
@@ -181,8 +183,10 @@ def mind_update_template_to_task(updated_template, task):
                     elm['Status'] = temp_dict['Status']
                     elm['Executor'] = temp_dict['Executor']
                     elm['style'] = temp_dict['style']
+                    elm['Schedule'] = temp_dict['Schedule']
                 else:
-                    elm['Status'] = 'active'
+                    elm['Status'] = 0
+                    elm['Schedule'] = 0
                     elm['Executor'] = 'pending'
                     elm['style'] = {"fontWeight": "bold", "color": "#f39c11"}
                 updated_template[index] = elm

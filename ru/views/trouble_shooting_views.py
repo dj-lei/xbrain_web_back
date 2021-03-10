@@ -78,7 +78,7 @@ def get(request):
                 node_id = request.GET.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)
                 data = mind_get_list(mind_search_id(res['_source']['nodeData'], node_id))
-                print(res['_source']['nodeData'])
+
                 result = []
                 for elm in data:
                     result.append({'id': elm[0], 'Task': elm[1], 'Status': elm[2], 'Schedule': elm[3]})
@@ -199,7 +199,7 @@ def save(request):
                     for elm in res:
                         elm['_source']['nodeData'] = mind_update_template_to_task(json.loads(data)['nodeData'], elm['_source']['nodeData'])
                         elm = json.loads(re.sub(", \"children\": \[\]", '', json.dumps(elm)))
-
+                        print(elm)
                         _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body={'doc': elm['_source']}, id=elm['_id'])
 
                 return JsonResponse({'content': 'Success'})
