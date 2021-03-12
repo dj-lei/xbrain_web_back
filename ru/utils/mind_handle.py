@@ -200,8 +200,47 @@ def mind_update_template_to_task(updated_template, task):
                 updated_template['Status'] = temp_dict['Status']
                 updated_template['Executor'] = temp_dict['Executor']
                 updated_template['style'] = temp_dict['style']
+                updated_template['Schedule'] = temp_dict['Schedule']
             else:
-                updated_template['Status'] = 'active'
+                updated_template['Status'] = 0
+                updated_template['Schedule'] = 0
                 updated_template['Executor'] = 'pending'
                 updated_template['style'] = {"fontWeight": "bold", "color": "#f39c11"}
     return updated_template
+
+
+def clear_children(data):
+    temp = data.copy()
+    for i, elm in enumerate(temp):
+        temp[i]['children'] = []
+    return temp
+
+
+def dict_retrieval_not_with_children(node_data, node_id):
+    if type(node_data) == list:
+        for i,elm in enumerate(node_data):
+            if elm['id'] == node_id:
+                temp = clear_children(node_data)
+                if elm.__contains__('children'):
+                    elm['children'] = clear_children(elm['children'])
+                temp[i]['children'] = elm['children']
+                return temp
+            else:
+                if elm.__contains__('children'):
+                    temp = dict_retrieval_not_with_children(elm['children'], node_id)
+                    if temp:
+                        temp2 = clear_children(node_data)
+                        temp2[i]['children'] = temp
+                        return temp2
+                    else:
+                        continue
+                else:
+                    continue
+    else:
+        if node_data['id'] == node_id:
+            return node_data
+        elif node_data.__contains__('children'):
+            return dict_retrieval_not_with_children(node_data['children'], node_id)
+        else:
+            return []
+    return []

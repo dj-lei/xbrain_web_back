@@ -199,7 +199,6 @@ def save(request):
                     for elm in res:
                         elm['_source']['nodeData'] = mind_update_template_to_task(json.loads(data)['nodeData'], elm['_source']['nodeData'])
                         elm = json.loads(re.sub(", \"children\": \[\]", '', json.dumps(elm)))
-                        print(elm)
                         _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body={'doc': elm['_source']}, id=elm['_id'])
 
                 return JsonResponse({'content': 'Success'})

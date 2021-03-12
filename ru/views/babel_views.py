@@ -1,5 +1,6 @@
 from ru.views import *
 import requests
+from ru.utils.mind_handle import *
 
 
 def get(request):
@@ -52,12 +53,15 @@ def get(request):
                 _ = es_ctrl.delete(index=cf['BABEL']['ES_INDEX_VIEWERS'], id=viewer_id)
                 return JsonResponse({'content': 'Success'})
             elif operate == cf['BABEL']['GET_TEST_DATA']:
-                # content = requests.get('http://10.166.152.40/ru/docman/get')
-                # test = eval(content.content.decode())['content']
-                # temp = base64.b64decode(test[0])
+                content = requests.get('http://10.166.152.40/ru/docman/get')
                 # return JsonResponse(eval(content.content.decode()))
-                return JsonResponse({'content': babel_test_data()[0]})
-                # return JsonResponse({'content': gzip.decompress(temp).decode()})
+
+                test = eval(content.content.decode())['content']
+                temp = base64.b64decode(test[0])
+                temp = json.loads(gzip.decompress(temp).decode())
+                # a = dict_retrieval_not_with_children(temp, 'UL_FBG_CB_3_SLV_ID.NUM')
+                # return JsonResponse({'content': babel_test_data()[0]})
+                return JsonResponse({'content': temp})
             elif operate == cf['BABEL']['HARDWARE_ENVIRONMENT_READ_STATUS']:
                 # content = requests.get('http://10.166.152.40/ru/deviceman/get')
                 # return JsonResponse(eval(content.content.decode()))
@@ -77,8 +81,9 @@ def save(request):
             operate = request.POST.get(cf['BABEL']['OPERATE'])
             if operate == cf['BABEL']['SYMBOL_NEW_ADD']:
                 category = request.POST.get(cf['BABEL']['CATEGORY'])
+                api_url = request.POST.get(cf['BABEL']['API_URL'])
                 symbol_name = request.POST.get(cf['BABEL']['SYMBOL_NAME'])
-                _ = es_ctrl.index(index=cf['BABEL']['ES_INDEX_SYMBOLS'], body={'symbol_name': symbol_name,
+                _ = es_ctrl.index(index=cf['BABEL']['ES_INDEX_SYMBOLS'], body={'symbol_name': symbol_name, 'api_bind_data':api_url,
                         'category': category, 'created_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'content': data})
                 return JsonResponse({'content': 'Success'})
             elif operate == cf['BABEL']['SYMBOL_UPDATE']:
@@ -113,14 +118,15 @@ def save(request):
                 _ = es_ctrl.update(index=cf['BABEL']['ES_INDEX_VIEWERS'], body={'doc': res}, id=viewer_id)
                 return JsonResponse({'content': 'Success', 'viewer_id': viewer_id})
             elif operate == cf['BABEL']['HARDWARE_ENVIRONMENT_SAVE_CONFIG']:
-                key = request.POST.get('key')
-                # file_dict = request.POST.items()
-                # data = {}
-                # for (k, v) in file_dict:
-                #     data[k] = (None, v)
-                # res = requests.post('http://10.166.152.40/ru/docman/value', files=data)
-                # return JsonResponse({'content': json.loads(res.content)})
-                return JsonResponse({'content': babel_test_he_data(int(os.getenv('SEED', 1)), key)})
+                # key = request.POST.get('key')
+                file_dict = request.POST.items()
+                data = {}
+                for (k, v) in file_dict:
+                    data[k] = (None, v)
+
+                res = requests.post('http://10.166.152.40/ru/docman/value', files=data)
+                return JsonResponse({'content': json.loads(res.content)})
+                # return JsonResponse({'content': babel_test_he_data(int(os.getenv('SEED', 1)), key)})
         return HttpResponse(404)
     except Exception as e:
         traceback.print_exc()
