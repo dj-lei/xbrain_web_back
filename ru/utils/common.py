@@ -91,6 +91,7 @@ def babel_test_data():
         {
           'id': 'aa',
           'name': 'Radon',
+          'params': [{'name': 'address_map', 'id': 'asdfnviehifha'}],
           'children': [
             {'id': 'bb', 'name': 'Calendar', 'value':5, 'type':'int', 'range':'""'},
             {'id': 'cc', 'name': 'Chrome', 'value':15, 'type':'int', 'range':[1,20]},
