@@ -102,6 +102,7 @@ def babel_test_data():
             {'id': 'interactive.select', 'name': 'select', 'value': '1', 'type': 'express', 'range': '""'}
             # 'api': 'http://localhost:8000/ru/babel/get?operate=get_interactive_data&interactive.layer=1&interactive.Param=abc'}
           ],
+          'server': 'http://localhost:8000/ru/babel/save',
         },
         {
           'id': 'eee',

@@ -53,20 +53,17 @@ def get(request):
                 _ = es_ctrl.delete(index=cf['BABEL']['ES_INDEX_VIEWERS'], id=viewer_id)
                 return JsonResponse({'content': 'Success'})
             elif operate == cf['BABEL']['GET_TEST_DATA']:
-                content = requests.get(request.GET.get('url'))
+                # content = requests.get(request.GET.get('url'))
                 # return JsonResponse(eval(content.content.decode()))
-
-                test = eval(content.content.decode())['content']
-                temp = base64.b64decode(test[0])
-                temp = json.loads(gzip.decompress(temp).decode())
-
+                # test = eval(content.content.decode())['content']
+                # temp = base64.b64decode(test[0])
+                # temp = json.loads(gzip.decompress(temp).decode())
                 # a = dict_retrieval_not_with_children(temp, 'UL_FBG_CB_3_SLV_ID.NUM')
-                # return JsonResponse({'content': babel_test_data()[0]})
-                return JsonResponse({'content': temp})
+                return JsonResponse({'content': babel_test_data()[0]})
             elif operate == cf['BABEL']['HARDWARE_ENVIRONMENT_READ_STATUS']:
-                content = requests.get(request.GET.get('url'))
-                return JsonResponse(eval(content.content.decode()))
-                # return JsonResponse({'content': babel_test_he_status()[0]})
+                # content = requests.get(request.GET.get('url'))
+                # return JsonResponse(eval(content.content.decode()))
+                return JsonResponse({'content': babel_test_he_status()[0]})
             elif operate == cf['BABEL']['GET_INTERACTIVE_DATA']:
                 os.environ['SEED'] = request.GET.get('interactive.layer')
                 return JsonResponse({'content': 'success'})
@@ -119,13 +116,13 @@ def save(request):
                 _ = es_ctrl.update(index=cf['BABEL']['ES_INDEX_VIEWERS'], body={'doc': res}, id=viewer_id)
                 return JsonResponse({'content': 'Success', 'viewer_id': viewer_id})
             elif operate == cf['BABEL']['HARDWARE_ENVIRONMENT_SAVE_CONFIG']:
-                # key = request.POST.get('key')
+                key = request.POST.get('key')
 
-                url = request.POST.get('url')
-                data = {'sid':(None, request.POST.get('sid')), 'docid':(None, request.POST.get('docid')),'key':(None, request.POST.get('key')),'addr_map':(None, request.POST.get('address_map'))}
-                res = requests.post(url, files=data)
-                return JsonResponse({'content': json.loads(res.content)})
-                # return JsonResponse({'content': babel_test_he_data(int(os.getenv('SEED', 1)), key)})
+                # url = request.POST.get('url')
+                # data = {'sid':(None, request.POST.get('sid')), 'docid':(None, request.POST.get('docid')),'key':(None, request.POST.get('key')),'addr_map':(None, request.POST.get('address_map'))}
+                # res = requests.post(url, files=data)
+                # return JsonResponse({'content': json.loads(res.content)})
+                return JsonResponse(babel_test_he_data(int(os.getenv('SEED', 1)), key))
             elif operate == cf['BABEL']['POST_INTERACTIVE_DATA']:
                 url = request.POST.get('url')
                 data = {'sid':(None, request.POST.get('sid')), 'docid':(None, request.POST.get('docid')),'key':(None, request.POST.get('key'))}
