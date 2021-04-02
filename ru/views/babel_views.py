@@ -42,7 +42,7 @@ def get(request):
                 if len(data) > 0:
                     for elm in data:
                         result.append({'id': elm['_id'], 'ViewerName': elm['_source']['viewer_name'],
-                                       'CreatedTime': elm['_source']['created_time']})
+                                       'Group': elm['_source']['group'] if "group" in elm['_source'].keys() else 'unknown', 'CreatedTime': elm['_source']['created_time']})
                 return JsonResponse({'content': result})
             elif operate == cf['BABEL']['GET_VIEWER']:
                 viewer_id = request.GET.get(cf['BABEL']['VIEWER_ID'])
@@ -87,7 +87,11 @@ def save(request):
             elif operate == cf['BABEL']['SYMBOL_UPDATE']:
                 symbol_id = request.POST.get(cf['BABEL']['SYMBOL_ID'])
                 res = es_ctrl.get(index=cf['BABEL']['ES_INDEX_SYMBOLS'], id=symbol_id)['_source']
-                res['content'] = data
+                if data is None:
+                    res['symbol_name'] = request.POST.get(cf['BABEL']['SYMBOL_NAME'])
+                    res['category'] = request.POST.get(cf['BABEL']['CATEGORY'])
+                else:
+                    res['content'] = data
                 _ = es_ctrl.update(index=cf['BABEL']['ES_INDEX_SYMBOLS'], body={'doc': res}, id=symbol_id)
                 return JsonResponse({'content': 'Success'})
             elif operate == cf['BABEL']['SAVE_API_BIND_DATA']:
@@ -106,13 +110,18 @@ def save(request):
                 return JsonResponse({'content': 'Success'})
             elif operate == cf['BABEL']['VIEWER_NEW_ADD']:
                 viewer_name = request.POST.get(cf['BABEL']['VIEWER_NAME'])
-                res = es_ctrl.index(index=cf['BABEL']['ES_INDEX_VIEWERS'], body={'viewer_name': viewer_name,
+                group = request.POST.get(cf['BABEL']['GROUP'])
+                res = es_ctrl.index(index=cf['BABEL']['ES_INDEX_VIEWERS'], body={'viewer_name': viewer_name, 'group': group,
                         'created_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'content': data})
                 return JsonResponse({'content': 'Success', 'viewer_id': res['_id']})
             elif operate == cf['BABEL']['VIEWER_UPDATE']:
                 viewer_id = request.POST.get(cf['BABEL']['VIEWER_ID'])
                 res = es_ctrl.get(index=cf['BABEL']['ES_INDEX_VIEWERS'], id=viewer_id)['_source']
-                res['content'] = data
+                if data is None:
+                    res['viewer_name'] = request.POST.get(cf['BABEL']['VIEWER_NAME'])
+                    res['group'] = request.POST.get(cf['BABEL']['GROUP'])
+                else:
+                    res['content'] = data
                 _ = es_ctrl.update(index=cf['BABEL']['ES_INDEX_VIEWERS'], body={'doc': res}, id=viewer_id)
                 return JsonResponse({'content': 'Success', 'viewer_id': viewer_id})
             elif operate == cf['BABEL']['HARDWARE_ENVIRONMENT_SAVE_CONFIG']:
