@@ -9,7 +9,7 @@ def get(request):
         if request.method == 'GET':
             operate = request.GET.get(cf['TROUBLE_SHOOTING']['OPERATE'])
             if operate == cf['TROUBLE_SHOOTING']['GET_TEMPLATE_TITLES']:
-                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TEMPLATE'])
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TEMPLATE'], size=200)
                 data = res['hits']['hits']
                 result = []
                 if len(data) > 0:
@@ -26,7 +26,7 @@ def get(request):
                 _ = es_ctrl.delete(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TEMPLATE'], id=template_id)
                 return JsonResponse({'content': 'Success'})
             elif operate == cf['TROUBLE_SHOOTING']['GET_TASK_TITLES']:
-                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'])
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], size=200)
                 data = res['hits']['hits']
                 result = []
                 if len(data) > 0:
@@ -48,13 +48,13 @@ def get(request):
                 #         _ = es_ctrl.delete(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], id=_id[i]['_id'])
 
                 _id = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'],
-                                     body=query_with([['task_id', template_id]]))['hits']['hits']
+                                     body=query_with([['task_id', template_id]]), size=200)['hits']['hits']
                 if len(_id) > 0:
                     for i in range(0, len(_id)):
                         _ = es_ctrl.delete(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'], id=_id[i]['_id'])
 
                 _id = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_COMMENTS'],
-                                     body=query_with([['task_id', template_id]]))['hits']['hits']
+                                     body=query_with([['task_id', template_id]]), size=200)['hits']['hits']
                 if len(_id) > 0:
                     for i in range(0, len(_id)):
                         _ = es_ctrl.delete(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_COMMENTS'], id=_id[i]['_id'])
@@ -86,14 +86,14 @@ def get(request):
             elif operate == cf['TROUBLE_SHOOTING']['GET_CHECKLIST_IMAGES']:
                 template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
                 node_id = request.GET.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
-                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits']
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], body=query_with([['task_id', template_id], ['node_id', node_id]]), size=200)['hits']['hits']
                 result = res[0]['_source']['content'] if len(res) > 0 else []
                 return JsonResponse({'content': result})
             elif operate == cf['TROUBLE_SHOOTING']['DELETE_CHECKLIST_IMAGE']:
                 template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
                 node_id = request.GET.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
                 uuid_id = request.GET.get(cf['TROUBLE_SHOOTING']['UUID_ID'])
-                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits'][0]
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], body=query_with([['task_id', template_id], ['node_id', node_id]]), size=200)['hits']['hits'][0]
 
                 for index, elm in enumerate(res['_source']['content']):
                     if elm['uuid'] == uuid_id:
@@ -104,7 +104,7 @@ def get(request):
             elif operate == cf['TROUBLE_SHOOTING']['GET_CHECKLIST_LOGS']:
                 template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
                 node_id = request.GET.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
-                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits']
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'], body=query_with([['task_id', template_id], ['node_id', node_id]]), size=200)['hits']['hits']
                 result = []
                 if len(res) > 0:
                     res = res[0]['_source']['content']
@@ -115,7 +115,7 @@ def get(request):
                 template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
                 node_id = request.GET.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
                 uuid_id = request.GET.get(cf['TROUBLE_SHOOTING']['UUID_ID'])
-                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits'][0]['_source']['content']
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'], body=query_with([['task_id', template_id], ['node_id', node_id]]), size=200)['hits']['hits'][0]['_source']['content']
 
                 for elm in res:
                     if elm['uuid'] == uuid_id:
@@ -128,7 +128,7 @@ def get(request):
                 template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
                 node_id = request.GET.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
                 uuid_id = request.GET.get(cf['TROUBLE_SHOOTING']['UUID_ID'])
-                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits'][0]
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'], body=query_with([['task_id', template_id], ['node_id', node_id]]), size=200)['hits']['hits'][0]
 
                 for index, elm in enumerate(res['_source']['content']):
                     if elm['uuid'] == uuid_id:
@@ -139,7 +139,7 @@ def get(request):
             elif operate == cf['TROUBLE_SHOOTING']['GET_CHECKLIST_COMMENTS']:
                 template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
                 node_id = request.GET.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
-                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_COMMENTS'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits']
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_COMMENTS'], body=query_with([['task_id', template_id], ['node_id', node_id]]), size=200)['hits']['hits']
                 result = []
                 if len(res) > 0:
                     res = res[0]['_source']['content']
@@ -193,7 +193,7 @@ def save(request):
                 _ = es_ctrl.index(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TEMPLATE'], body=data, id=template_id)
 
                 res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'],
-                                     body=query_with([['template_id', template_id]]))['hits']['hits']
+                                     body=query_with([['template_id', template_id]]), size=200)['hits']['hits']
 
                 if len(res) > 0:
                     for elm in res:
@@ -263,7 +263,7 @@ def save(request):
                 node_id = request.POST.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
                 size = request.POST.get(cf['TROUBLE_SHOOTING']['GET_IMAGES_SIZE'])
 
-                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits']
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_IMAGES'], body=query_with([['task_id', template_id], ['node_id', node_id]]), size=200)['hits']['hits']
                 if len(res) > 0:
                     _id = res[0]['_id']
                     res = res[0]['_source']
@@ -287,7 +287,7 @@ def save(request):
                 node_id = request.POST.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
                 size = request.POST.get(cf['TROUBLE_SHOOTING']['GET_LOGS_SIZE'])
 
-                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits']
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_LOGS'], body=query_with([['task_id', template_id], ['node_id', node_id]]), size=200)['hits']['hits']
                 if len(res) > 0:
                     _id = res[0]['_id']
                     res = res[0]['_source']
@@ -310,7 +310,7 @@ def save(request):
                 template_id = request.POST.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
                 node_id = request.POST.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
 
-                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_COMMENTS'], body=query_with([['task_id', template_id], ['node_id', node_id]]))['hits']['hits']
+                res = es_ctrl.search(index=cf['TROUBLE_SHOOTING']['ES_INDEX_CHECKLIST_COMMENTS'], body=query_with([['task_id', template_id], ['node_id', node_id]]), size=200)['hits']['hits']
                 if len(res) > 0:
                     _id = res[0]['_id']
                     res = res[0]['_source']

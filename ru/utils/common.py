@@ -97,9 +97,9 @@ def babel_test_data():
             {'id': 'cc', 'name': 'Chrome', 'value':15, 'type':'int', 'range':[1,20]},
             {'id': 'dd', 'name': 'Webstorm', 'value':10, 'type':'int', 'range':[1,20]},
             {'id': 'ee', 'name': 'Firefox', 'value': 20, 'type': 'int', 'range': [1,20]},
-            {'id': 'interactive.Param', 'name': 'Param', 'value': 'var', 'type': 'text', 'range': '""'},
-            {'id': 'interactive.layer', 'name': 'layer', 'value': '1', 'type': 'list', 'range': ['1', '2', '3']},
-            {'id': 'interactive.select', 'name': 'select', 'value': '1', 'type': 'express', 'range': '""'}
+            {'id': 'interactive_Param', 'name': 'Param', 'value': 'var', 'type': 'text', 'range': '""'},
+            {'id': 'interactive_layer', 'name': 'layer', 'value': '1', 'type': 'list', 'range': ['1', '2', '3']},
+            {'id': 'interactive_select', 'name': 'select', 'value': '1', 'type': 'express', 'range': '""'}
             # 'api': 'http://localhost:8000/ru/babel/get?operate=get_interactive_data&interactive.layer=1&interactive.Param=abc'}
           ],
           'server': 'http://localhost:8000/ru/babel/save',
@@ -116,8 +116,8 @@ def babel_test_data():
                   'id': 'gg',
                   'name': 'src',
                   'children': [
-                    { 'id': 'hh', 'name': 'index' , 'value':echarts_test_data(), 'type':'echarts', 'range':'""'},
-                    {'id': 'jj', 'name': 'bootstrap' , 'value':'kk1', 'type':'echarts', 'range':'""'},
+                    { 'id': 'hh', 'name': 'index' , 'value':12, 'type':'int', 'range':'""'},
+                    {'id': 'jj', 'name': 'bootstrap' , 'value':'kk1', 'type':'int', 'range':'""'},
                   ],
                 },
               ],
@@ -130,9 +130,9 @@ def babel_test_data():
 
 def babel_test_he_status(): # status: free,holding,ready
     tmp = [
-        {'id': 'a', 'name': 'hardware_environment1', 'status': 'free', 'is_data_updated': False},
-        {'id': 'b', 'name': 'hardware_environment2', 'status': 'holding', 'is_data_updated': False},
-        {'id': 'c', 'name': 'hardware_environment3', 'status': 'ready', 'is_data_updated': True}
+        {'id': 'a', 'name': 'hardware_environment1', 'server': 'http://localhost:8000/ru/babel/save'},
+        {'id': 'b', 'name': 'hardware_environment2', 'server': 'http://localhost:8000/ru/babel/save'},
+        {'id': 'c', 'name': 'hardware_environment3', 'server': 'http://localhost:8000/ru/babel/save'}
     ],
     return tmp
 

@@ -8,7 +8,7 @@ def get(request):
         if request.method == 'GET':
             operate = request.GET.get(cf['BABEL']['OPERATE'])
             if operate == cf['BABEL']['GET_SYMBOLS_TITLES']:
-                res = es_ctrl.search(index=cf['BABEL']['ES_INDEX_SYMBOLS'])
+                res = es_ctrl.search(index=cf['BABEL']['ES_INDEX_SYMBOLS'], size=200)
                 data = res['hits']['hits']
                 result = []
                 symbols = []
@@ -36,7 +36,7 @@ def get(request):
                 _ = es_ctrl.delete(index=cf['BABEL']['ES_INDEX_SYMBOLS'], id=symbol_id)
                 return JsonResponse({'content': 'Success'})
             elif operate == cf['BABEL']['GET_VIEWERS_TITLES']:
-                res = es_ctrl.search(index=cf['BABEL']['ES_INDEX_VIEWERS'])
+                res = es_ctrl.search(index=cf['BABEL']['ES_INDEX_VIEWERS'], size=200)
                 data = res['hits']['hits']
                 result = []
                 if len(data) > 0:
@@ -81,9 +81,9 @@ def save(request):
                 category = request.POST.get(cf['BABEL']['CATEGORY'])
                 api_url = request.POST.get(cf['BABEL']['API_URL'])
                 symbol_name = request.POST.get(cf['BABEL']['SYMBOL_NAME'])
-                _ = es_ctrl.index(index=cf['BABEL']['ES_INDEX_SYMBOLS'], body={'symbol_name': symbol_name, 'api_bind_data':api_url,
+                res = es_ctrl.index(index=cf['BABEL']['ES_INDEX_SYMBOLS'], body={'symbol_name': symbol_name, 'api_bind_data':api_url,
                         'category': category, 'created_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'content': data})
-                return JsonResponse({'content': 'Success'})
+                return JsonResponse({'content': 'Success', 'symbol_id': res['_id']})
             elif operate == cf['BABEL']['SYMBOL_UPDATE']:
                 symbol_id = request.POST.get(cf['BABEL']['SYMBOL_ID'])
                 res = es_ctrl.get(index=cf['BABEL']['ES_INDEX_SYMBOLS'], id=symbol_id)['_source']
@@ -93,7 +93,7 @@ def save(request):
                 else:
                     res['content'] = data
                 _ = es_ctrl.update(index=cf['BABEL']['ES_INDEX_SYMBOLS'], body={'doc': res}, id=symbol_id)
-                return JsonResponse({'content': 'Success'})
+                return JsonResponse({'content': 'Success', 'symbol_id': symbol_id})
             elif operate == cf['BABEL']['SAVE_API_BIND_DATA']:
                 symbol_id = request.POST.get(cf['BABEL']['SYMBOL_ID'])
                 api_url = request.POST.get(cf['BABEL']['API_URL'])
