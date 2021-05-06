@@ -8,12 +8,12 @@ def mind_get_list(node_data):
             if elm.__contains__('children'):
                 temp.extend(mind_get_list(elm['children']))
             else:
-                temp.append([elm['id'], elm['topic'], elm['Status'], elm['Schedule']])
+                temp.append({'id': elm['id'], 'Task': elm['topic'], 'Level': elm['Level'] if elm.__contains__('Level') else 1, 'StartEndTime': elm['StartEndTime'] if elm.__contains__('StartEndTime') else [], 'Executor': elm['Executor'] if elm.__contains__('Executor') else "pending", 'Status': elm['Status'] if elm.__contains__('Status') else "GoOn", 'StatusColor': elm['StatusColor'] if elm.__contains__('StatusColor') else "", 'Schedule': elm['Schedule'] if elm.__contains__('Schedule') else 0, 'Remark': elm['Remark'] if elm.__contains__('Remark') else {}})
     else:
         if node_data.__contains__('children'):
             temp.extend(mind_get_list(node_data['children']))
         else:
-            temp.append([node_data['id'], node_data['topic'], node_data['Status'], node_data['Schedule']])
+            temp.append({'id': node_data['id'], 'Task': node_data['topic'], 'Level': node_data['Level'] if node_data.__contains__('Level') else 1, 'StartEndTime': node_data['StartEndTime'] if node_data.__contains__('StartEndTime') else [], 'Executor': node_data['Executor'] if node_data.__contains__('Executor') else "pending", 'Status': node_data['Status'] if node_data.__contains__('Status') else "GoOn", 'StatusColor': node_data['StatusColor'] if node_data.__contains__('StatusColor') else "", 'Schedule': node_data['Schedule'] if node_data.__contains__('Schedule') else 0, 'Remark': node_data['Remark'] if node_data.__contains__('Remark') else {}})
     return temp
 
 
@@ -23,6 +23,7 @@ def mind_search_id(node_data, node_id):
             if elm['id'] == node_id:
                 return elm
             else:
+
                 if elm.__contains__('children'):
                     temp = mind_search_id(elm['children'], node_id)
                     if temp:
@@ -82,12 +83,12 @@ def mind_export_to_csv(node_data, node=None):
             if elm.__contains__('children'):
                 temp.extend(mind_export_to_csv(elm['children'], node+'/'+elm['topic']))
             else:
-                temp.append([elm['topic'], node, elm['Status'], elm['Schedule']])
+                temp.append([elm['topic'], node, elm['Level'], elm['Executor'], elm['StartEndTime'], elm['Status'], elm['Schedule']])
     else:
         if node_data.__contains__('children'):
             temp.extend(mind_export_to_csv(node_data['children'], node+'/'+node_data['topic']))
         else:
-            temp.append([node_data['topic'], node, node_data['Status'], node_data['Schedule']])
+            temp.append([node_data['topic'], node, node_data['Level'], node_data['Executor'], node_data['StartEndTime'], node_data['Status'], node_data['Schedule']])
     return temp
 
 

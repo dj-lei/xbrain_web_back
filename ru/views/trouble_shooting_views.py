@@ -79,10 +79,10 @@ def get(request):
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)
                 data = mind_get_list(mind_search_id(res['_source']['nodeData'], node_id))
 
-                result = []
-                for elm in data:
-                    result.append({'id': elm[0], 'Task': elm[1], 'Status': elm[2], 'Schedule': elm[3]})
-                return JsonResponse({'content': result, 'id': template_id})
+                # result = []
+                # for elm in data:
+                #     result.append({'id': elm[0], 'Task': elm[1], 'Group': elm['_source']['group'] if "group" in elm['_source'].keys() else 'unknown', 'Status': elm[2], 'Schedule': elm[3]})
+                return JsonResponse({'content': data, 'id': template_id})
             elif operate == cf['TROUBLE_SHOOTING']['GET_CHECKLIST_IMAGES']:
                 template_id = request.GET.get(cf['TROUBLE_SHOOTING']['TEMPLATE_ID'])
                 node_id = request.GET.get(cf['TROUBLE_SHOOTING']['NODE_ID'])
@@ -151,8 +151,8 @@ def get(request):
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], id=template_id)
                 data = res['_source']['nodeData']['children']
                 temp = mind_export_to_csv(data)
-                temp = pd.DataFrame(temp, columns=['Tasks', 'Responsible', 'Status', 'Schedule'])
-                temp['Status'] = temp['Status'].map({0: 'GoOn', 1: 'Done', 2: 'Uncertain', 3: 'Shooting'})
+                temp = pd.DataFrame(temp, columns=['Tasks', 'Responsible', 'Level', 'Executor', 'StartEndTime', 'Status', 'Schedule'])
+                # temp['Status'] = temp['Status'].map({0: 'GoOn', 1: 'Done', 2: 'Uncertain', 3: 'Shooting'})
 
                 excel_file = BytesIO()
                 xlwriter = pd.ExcelWriter(excel_file, engine='xlsxwriter')
@@ -220,17 +220,22 @@ def save(request):
 
                 for select in json.loads(selected):
                     temp = mind_search_id(res['nodeData'], select['id'])
-                    temp['Schedule'] = select['Schedule']
+                    temp['Level'] = select['Level']
+                    temp['Executor'] = select['Executor']
+                    temp['StartEndTime'] = select['StartEndTime']
                     temp['Status'] = select['Status']
-                    if select['Status'] == 0:
+                    temp['Schedule'] = select['Schedule']
+                    temp['Remark'] = select['Remark']
+                    if select['Status'] == "GoOn":
                         temp['style'] = {"fontWeight": "bold", "color": "#f39c11"}
-                    elif select['Status'] == 1:
+                    elif select['Status'] == "Done":
                         temp['style'] = {"fontWeight": "bold", "color": "#00FF00"}
-                    elif select['Status'] == 2:
+                    elif select['Status'] == "Uncert":
                         temp['style'] = {"fontWeight": "bold", "color": "#C0C0C0"}
-                    elif select['Status'] == 3:
+                    elif select['Status'] == "Shoot":
                         temp['style'] = {"fontWeight": "bold", "color": "#FF0000"}
-                    res = json.loads(re.sub(json.dumps(mind_search_id(res['nodeData'], select['id'])), json.dumps(temp), json.dumps(res)))
+                    # res = json.loads(re.sub(json.dumps(mind_search_id(res['nodeData'], select['id'])), json.dumps(temp), json.dumps(res)))
+                    res = json.loads(json.dumps(res).replace(json.dumps(mind_search_id(res['nodeData'], select['id'])), json.dumps(temp)))
                 _ = es_ctrl.update(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TASK'], body={'doc': res}, id=template_id)
                 return JsonResponse({'content': res})
             elif operate == cf['TROUBLE_SHOOTING']['RELEASE_TASK']:
@@ -241,7 +246,7 @@ def save(request):
                 logs_size = request.POST.get(cf['TROUBLE_SHOOTING']['GET_LOGS_SIZE'])
 
                 res = es_ctrl.get(index=cf['TROUBLE_SHOOTING']['ES_INDEX_TEMPLATE'], id=template_id)['_source']
-                res = json.loads(re.sub(r'\"topic\"', '"Status": 0, "Schedule":0, "Executor": "pending", "style": {"fontWeight": "bold", "color": "#f39c11"}, "topic"', json.dumps(res)).replace(', \"children\": []', ''))
+                res = json.loads(re.sub(r'\"topic\"', '"Level": 1, "StartEndTime": [], "Status": "GoOn", "Schedule":0, "Executor": "pending", "style": {"fontWeight": "bold", "color": "#f39c11"}, "topic"', json.dumps(res)).replace(', \"children\": []', ''))
                 res['template_id'] = template_id
                 res['Description'] = json.loads(description)
                 res['Group'] = group

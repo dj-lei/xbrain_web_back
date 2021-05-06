@@ -116,8 +116,8 @@ def babel_test_data():
                   'id': 'gg',
                   'name': 'src',
                   'children': [
-                    { 'id': 'hh', 'name': 'index' , 'value':12, 'type':'int', 'range':'""'},
-                    {'id': 'jj', 'name': 'bootstrap' , 'value':'kk1', 'type':'int', 'range':'""'},
+                    { 'id': 'hh.aa', 'name': 'index' , 'value':12, 'type':'int', 'range':'""'},
+                    {'id': 'jj.bb', 'name': 'bootstrap' , 'value':'kk1', 'type':'int', 'range':'""'},
                   ],
                 },
               ],
