@@ -11,9 +11,10 @@ def get(request):
                 res = es_ctrl.search(index=cf['PINMUX']['ES_INDEX'])
                 data = res['hits']['hits']
                 result = []
-                for elm in data:
-                    result.append({'id': elm['_id'], 'TemplateName': elm['_source']['TemplateName'],
-                                   'Asic': elm['_source']['Asic'], 'Date': elm['_source']['Date']})
+                if len(data) > 0:
+                    for elm in data:
+                        result.append({'id': elm['_id'], 'TemplateName': elm['_source']['TemplateName'],
+                                       'Asic': elm['_source']['Asic'], 'Date': elm['_source']['Date']})
                 return JsonResponse({'content': result})
             elif operate == cf['PINMUX']['DOWNLOAD']:
                 template_id = request.GET.get("template_id")

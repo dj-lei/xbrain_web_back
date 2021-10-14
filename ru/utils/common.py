@@ -91,18 +91,15 @@ def babel_test_data():
         {
           'id': 'aa',
           'name': 'Radon',
-          'params': [{'name': 'address_map', 'id': 'asdfnviehifha'}],
           'children': [
-            {'id': 'bb', 'name': 'Calendar', 'value':5, 'type':'int', 'range':'""'},
-            {'id': 'cc', 'name': 'Chrome', 'value':15, 'type':'int', 'range':[1,20]},
-            {'id': 'dd', 'name': 'Webstorm', 'value':10, 'type':'int', 'range':[1,20]},
-            {'id': 'ee', 'name': 'Firefox', 'value': 20, 'type': 'int', 'range': [1,20]},
-            {'id': 'interactive_Param', 'name': 'Param', 'value': 'var', 'type': 'text', 'range': '""'},
-            {'id': 'interactive_layer', 'name': 'layer', 'value': '1', 'type': 'list', 'range': ['1', '2', '3']},
-            {'id': 'interactive_select', 'name': 'select', 'value': '1', 'type': 'express', 'range': '""'}
-            # 'api': 'http://localhost:8000/ru/babel/get?operate=get_interactive_data&interactive.layer=1&interactive.Param=abc'}
+            {'id': 'bb', 'name': 'Calendar', 'value':5, 'type':'int'},
+            {'id': 'cc', 'name': 'Chrome', 'value':15, 'type':'int'},
+            {'id': 'dd', 'name': 'Webstorm', 'value':10, 'type':'int'},
+            {'id': 'ee', 'name': 'Firefox', 'value': 20, 'type': 'int'},
+            {'id': 'interactive_Param', 'name': 'Param', 'value': 'var', 'type': 'text'},
+            {'id': 'interactive_layer', 'name': 'layer', 'value': '1', 'type': 'list'},
+            {'id': 'interactive_select', 'name': 'select', 'value': '1', 'type': 'express'}
           ],
-          'server': 'http://localhost:8000/ru/babel/save',
         },
         {
           'id': 'eee',
@@ -116,8 +113,8 @@ def babel_test_data():
                   'id': 'gg',
                   'name': 'src',
                   'children': [
-                    { 'id': 'hh.aa', 'name': 'index' , 'value':12, 'type':'int', 'range':'""'},
-                    {'id': 'jj.bb', 'name': 'bootstrap' , 'value':'kk1', 'type':'int', 'range':'""'},
+                    { 'id': 'hh.aa', 'name': 'index' , 'value':12, 'type':'int'},
+                    {'id': 'jj.bb', 'name': 'bootstrap' , 'value':'kk1', 'type':'int'},
                   ],
                 },
               ],
