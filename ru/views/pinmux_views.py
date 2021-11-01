@@ -8,7 +8,7 @@ def get(request):
         if request.method == 'GET':
             operate = request.GET.get(cf['PINMUX']['OPERATE'])
             if operate == cf['PINMUX']['GET_TEMPLATE_TITLES']:
-                res = es_ctrl.search(index=cf['PINMUX']['ES_INDEX'])
+                res = es_ctrl.search(index=cf['PINMUX']['ES_INDEX'], size=200)
                 data = res['hits']['hits']
                 result = []
                 if len(data) > 0:
