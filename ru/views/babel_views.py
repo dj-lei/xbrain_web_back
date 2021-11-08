@@ -63,8 +63,8 @@ def get(request):
                 # temp = base64.b64decode(test[0])
                 # temp = json.loads(gzip.decompress(temp).decode())
                 # a = dict_retrieval_not_with_children(temp, 'UL_FBG_CB_3_SLV_ID.NUM')
-                # return JsonResponse({'content': babel_test_data()[0]})
-                return JsonResponse({'content': {'radon_point1': random.randint(0, 10), 'radon_point2': random.randint(5, 20)}})
+                return JsonResponse({'content': babel_test_data()})
+                # return JsonResponse({'content': {'radon_point1': random.randint(0, 10), 'radon_point2': random.randint(5, 20)}})
             elif operate == cf['BABEL']['HARDWARE_ENVIRONMENT_READ_STATUS']:
                 # content = requests.get(request.GET.get('url'))
                 # return JsonResponse(eval(content.content.decode()))

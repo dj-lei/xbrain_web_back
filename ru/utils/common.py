@@ -2,6 +2,8 @@ import gzip
 import base64
 import random
 import math
+import json
+import pandas as pd
 from PIL import Image
 from io import BytesIO
 # from Crypto.Cipher import AES
@@ -87,42 +89,58 @@ def echarts_test_data(data=[[12, 5], [24, 20], [36, 36], [48, 10], [60, 10], [72
 
 
 def babel_test_data():
-    tmp = [
-        {
-          'id': 'aa',
-          'name': 'Radon',
-          'children': [
-            {'id': 'bb', 'name': 'Calendar', 'value':5, 'type':'int'},
-            {'id': 'cc', 'name': 'Chrome', 'value':15, 'type':'int'},
-            {'id': 'dd', 'name': 'Webstorm', 'value':10, 'type':'int'},
-            {'id': 'ee', 'name': 'Firefox', 'value': 20, 'type': 'int'},
-            {'id': 'interactive_Param', 'name': 'Param', 'value': 'var', 'type': 'text'},
-            {'id': 'interactive_layer', 'name': 'layer', 'value': '1', 'type': 'list'},
-            {'id': 'interactive_select', 'name': 'select', 'value': '1', 'type': 'express'}
-          ],
-        },
-        {
-          'id': 'eee',
-          'name': 'Xilinx',
-          'children': [
-            {
-              'id': 'ff',
-              'name': 'vuetify',
-              'children': [
-                {
-                  'id': 'gg',
-                  'name': 'src',
-                  'children': [
-                    { 'id': 'hh.aa', 'name': 'index' , 'value':12, 'type':'int'},
-                    {'id': 'jj.bb', 'name': 'bootstrap' , 'value':'kk1', 'type':'int'},
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    return tmp
+    data = pd.read_excel("D:\\projects\\test\\RSW_Monitor.xlsx")
+    a_side = list(data['A Side'].values)
+    b_side = list(data['B Side'].values)
+    a_side.extend(b_side)
+    a_side = set(a_side)
+
+    nodes = []
+    for node in a_side:
+        nodes.append({'id': node})
+
+    links = []
+    for rel, source, target in data[['High Speed Link', 'A Side', 'B Side']].values:
+        links.append({'source': source, 'target': target, 'type': rel})
+
+    types = list(set(data['High Speed Link'].values))
+    return {'nodes': nodes, 'links': links, 'types': types}
+    # tmp = [
+    #     {
+    #       'id': 'aa',
+    #       'name': 'Radon',
+    #       'children': [
+    #         {'id': 'bb', 'name': 'Calendar', 'value':5, 'type':'int'},
+    #         {'id': 'cc', 'name': 'Chrome', 'value':15, 'type':'int'},
+    #         {'id': 'dd', 'name': 'Webstorm', 'value':10, 'type':'int'},
+    #         {'id': 'ee', 'name': 'Firefox', 'value': 20, 'type': 'int'},
+    #         {'id': 'interactive_Param', 'name': 'Param', 'value': 'var', 'type': 'text'},
+    #         {'id': 'interactive_layer', 'name': 'layer', 'value': '1', 'type': 'list'},
+    #         {'id': 'interactive_select', 'name': 'select', 'value': '1', 'type': 'express'}
+    #       ],
+    #     },
+    #     {
+    #       'id': 'eee',
+    #       'name': 'Xilinx',
+    #       'children': [
+    #         {
+    #           'id': 'ff',
+    #           'name': 'vuetify',
+    #           'children': [
+    #             {
+    #               'id': 'gg',
+    #               'name': 'src',
+    #               'children': [
+    #                 { 'id': 'hh.aa', 'name': 'index' , 'value':12, 'type':'int'},
+    #                 {'id': 'jj.bb', 'name': 'bootstrap' , 'value':'kk1', 'type':'int'},
+    #               ],
+    #             },
+    #           ],
+    #         },
+    #       ],
+    #     },
+    #   ],
+    # return tmp
 
 
 def babel_test_he_status(): # status: free,holding,ready
