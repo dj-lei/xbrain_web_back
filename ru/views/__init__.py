@@ -6,9 +6,11 @@ import time
 import uuid
 import difflib
 # import torch
+import paramiko
 import configparser
 import traceback
 import pandas as pd
+import numpy as np
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.http import HttpResponseBadRequest
@@ -16,6 +18,7 @@ from django.shortcuts import render
 from io import BytesIO
 from elasticsearch import Elasticsearch
 from ru.utils.common import *
+from ru.utils.db_tool import *
 # from sentence_transformers import SentenceTransformer, util
 
 cf = configparser.ConfigParser()
@@ -29,6 +32,9 @@ else:
     server_address = 'localhost'
 es_ctrl = Elasticsearch([{'host': server_address, 'port': 9200}])
 
+# ssh = paramiko.SSHClient()
+# ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+# ssh.connect('127.0.0.1', port=9021, username='root', password='123456')
 
 # get info source vectors
 # def is_json(text):

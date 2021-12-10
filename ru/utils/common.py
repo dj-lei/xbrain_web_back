@@ -90,14 +90,35 @@ def echarts_test_data(data=[[12, 5], [24, 20], [36, 36], [48, 10], [60, 10], [72
 
 def babel_test_data():
     data = pd.read_excel("D:\\projects\\test\\RSW_Monitor.xlsx")
-    a_side = list(data['A Side'].values)
-    b_side = list(data['B Side'].values)
-    a_side.extend(b_side)
-    a_side = set(a_side)
+    RSW_Monitor_node = pd.read_excel("D:\\projects\\test\\RSW_Monitor_node.xlsx")
+
+    level = list(RSW_Monitor_node.Level.values)
+    rel = {}
+    rel_flag = {}
+    height = 1000
+    width = 200
+    width_clearance = 50
+    height_clearance = 20
+    RSW_Monitor_node['height'] = 0
+    RSW_Monitor_node['width'] = width - width_clearance
+    RSW_Monitor_node['location_x'] = 0
+    RSW_Monitor_node['location_y'] = 0
+
+    for i in set(level):
+        rel[str(i)] = level.count(i)
+        rel_flag[str(i)] = 0
+
+    for i, level in enumerate(RSW_Monitor_node.Level.values):
+        RSW_Monitor_node.loc[i, 'height'] = int(height / rel[str(level)]) - height_clearance
+        RSW_Monitor_node.loc[i, 'location_x'] = level * width * 2
+
+        num = rel_flag[str(level)]
+        RSW_Monitor_node.loc[i, 'location_y'] = num * int(height / rel[str(level)])
+        rel_flag[str(level)] = rel_flag[str(level)] + 1
 
     nodes = []
-    for node in a_side:
-        nodes.append({'id': node})
+    for node,level,height,width,location_x,location_y in RSW_Monitor_node.values:
+        nodes.append({'id': node, 'height': height, 'width': width, 'location_x': location_x, 'location_y': location_y})
 
     links = []
     for rel, source, target in data[['High Speed Link', 'A Side', 'B Side']].values:
@@ -105,43 +126,25 @@ def babel_test_data():
 
     types = list(set(data['High Speed Link'].values))
     return {'nodes': nodes, 'links': links, 'types': types}
-    # tmp = [
-    #     {
-    #       'id': 'aa',
-    #       'name': 'Radon',
-    #       'children': [
-    #         {'id': 'bb', 'name': 'Calendar', 'value':5, 'type':'int'},
-    #         {'id': 'cc', 'name': 'Chrome', 'value':15, 'type':'int'},
-    #         {'id': 'dd', 'name': 'Webstorm', 'value':10, 'type':'int'},
-    #         {'id': 'ee', 'name': 'Firefox', 'value': 20, 'type': 'int'},
-    #         {'id': 'interactive_Param', 'name': 'Param', 'value': 'var', 'type': 'text'},
-    #         {'id': 'interactive_layer', 'name': 'layer', 'value': '1', 'type': 'list'},
-    #         {'id': 'interactive_select', 'name': 'select', 'value': '1', 'type': 'express'}
-    #       ],
-    #     },
-    #     {
-    #       'id': 'eee',
-    #       'name': 'Xilinx',
-    #       'children': [
-    #         {
-    #           'id': 'ff',
-    #           'name': 'vuetify',
-    #           'children': [
-    #             {
-    #               'id': 'gg',
-    #               'name': 'src',
-    #               'children': [
-    #                 { 'id': 'hh.aa', 'name': 'index' , 'value':12, 'type':'int'},
-    #                 {'id': 'jj.bb', 'name': 'bootstrap' , 'value':'kk1', 'type':'int'},
-    #               ],
-    #             },
-    #           ],
-    #         },
-    #       ],
-    #     },
-    #   ],
-    # return tmp
 
+
+# def babel_test_data():
+#     data = pd.read_excel("D:\\projects\\test\\RSW_Monitor.xlsx")
+#     a_side = list(data['A Side'].values)
+#     b_side = list(data['B Side'].values)
+#     a_side.extend(b_side)
+#     a_side = set(a_side)
+#
+#     nodes = []
+#     for node in a_side:
+#         nodes.append({'id': node})
+#
+#     links = []
+#     for rel, source, target in data[['High Speed Link', 'A Side', 'B Side']].values:
+#         links.append({'source': source, 'target': target, 'type': rel})
+#
+#     types = list(set(data['High Speed Link'].values))
+#     return {'nodes': nodes, 'links': links, 'types': types}
 
 def babel_test_he_status(): # status: free,holding,ready
     tmp = [

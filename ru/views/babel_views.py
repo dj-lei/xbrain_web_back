@@ -64,7 +64,8 @@ def get(request):
                 # temp = json.loads(gzip.decompress(temp).decode())
                 # a = dict_retrieval_not_with_children(temp, 'UL_FBG_CB_3_SLV_ID.NUM')
                 return JsonResponse({'content': babel_test_data()})
-                # return JsonResponse({'content': {'radon_point1': random.randint(0, 10), 'radon_point2': random.randint(5, 20)}})
+            elif operate == cf['BABEL']['GET_ECHART_TEST_DATA']:
+                return JsonResponse({'content': {'radon rxpwr': random.randint(0, 10), 'radon ipwr': random.randint(5, 20), 'radon wpwr': random.randint(10, 15)}})
             elif operate == cf['BABEL']['HARDWARE_ENVIRONMENT_READ_STATUS']:
                 # content = requests.get(request.GET.get('url'))
                 # return JsonResponse(eval(content.content.decode()))
